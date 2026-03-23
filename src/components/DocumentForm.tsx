@@ -110,8 +110,19 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
   };
 
   const handleSave = () => {
-    if (!selectedClient) {
-      toast.error("Моля, изберете клиент");
+    let currentClient = selectedClient;
+    
+    // Auto-create client if no client selected but assignor is filled
+    if (!currentClient && assignor.trim()) {
+      currentClient = onAutoCreateClient({
+        name: assignor.trim(),
+        contactPerson: signFor.trim() || undefined,
+      });
+      toast.success(`Клиентът "${assignor.trim()}" е създаден автоматично`);
+    }
+    
+    if (!currentClient) {
+      toast.error("Моля, изберете клиент или въведете Възложител");
       return;
     }
     const versionData = getVersionData();
