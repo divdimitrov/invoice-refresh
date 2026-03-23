@@ -125,7 +125,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setEndDate("");
     setSignFor(selectedClient?.contactPerson || "");
     setSignBy("Александър Караманов");
-    setProtocolText(generateProtocolText("", selectedClient?.contactPerson || ""));
+    setProtocolText(generateProtocolText("", selectedClient?.contactPerson || "", ""));
     setProducts([]);
     onClearEdit();
   };
