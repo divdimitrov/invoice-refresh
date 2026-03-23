@@ -115,6 +115,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setDocType("protocol");
     setDocNumber("");
     setAssignor(selectedClient?.name || "");
+    setClientSearch(selectedClient?.name || "");
     setExecutor("Александър Строй ЕООД");
     setObject("");
     setStartDate("");
