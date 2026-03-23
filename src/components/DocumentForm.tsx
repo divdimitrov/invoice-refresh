@@ -198,7 +198,16 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 setClientSearch("");
                 setAssignor("");
                 setSignFor("");
-                resetForm();
+                setDocType("protocol");
+                setDocNumber("");
+                setExecutor("Александър Строй ЕООД");
+                setObject("");
+                setStartDate("");
+                setEndDate("");
+                setSignBy("Александър Караманов");
+                setProtocolText(generateProtocolText("", ""));
+                setProducts([]);
+                onClearEdit();
                 toast.info("Клиентът е премахнат от формата");
               }}
             >
