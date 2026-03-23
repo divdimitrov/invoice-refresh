@@ -41,7 +41,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     return `Днес ${dateFormatted} Подписаните, представители на Възложителя - ${signForStr} и Александър Караманов - представител на Изпълнителя, след проверка на място установихме, че към ${endDateFormatted} са извършени и подлежат на заплащане въз основа на този протокол, следните натурални видове строително и монтажни работи`;
   };
 
-  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", ""));
+  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: "" as string | number, unit: "", price: "" as string | number });
 
