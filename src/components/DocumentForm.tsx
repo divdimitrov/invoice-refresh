@@ -42,7 +42,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
 
   const [protocolText, setProtocolText] = useState(() => generateProtocolText("", ""));
   const [products, setProducts] = useState<Product[]>([]);
-  const [newProduct, setNewProduct] = useState({ name: "", quantity: 1, unit: "бр.", price: 0 });
+  const [newProduct, setNewProduct] = useState({ name: "", quantity: "" as string | number, unit: "", price: "" as string | number });
 
   useEffect(() => {
     if (selectedClient && !editingDocument) {
@@ -89,8 +89,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
 
   const addProduct = () => {
     if (!newProduct.name.trim()) return;
-    setProducts([...products, { ...newProduct, id: crypto.randomUUID() }]);
-    setNewProduct({ name: "", quantity: 1, unit: "бр.", price: 0 });
+    const qty = Number(newProduct.quantity) || 0;
+    const prc = Number(newProduct.price) || 0;
+    setProducts([...products, { name: newProduct.name, quantity: qty, unit: newProduct.unit || "бр.", price: prc, id: crypto.randomUUID() }]);
+    setNewProduct({ name: "", quantity: "", unit: "", price: "" });
     toast.success("Продуктът е добавен");
   };
 
@@ -415,15 +417,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">К-во</Label>
-                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={1} value={newProduct.quantity} onChange={(e) => setNewProduct({ ...newProduct, quantity: Number(e.target.value) })} />
+                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={1} placeholder="0" value={newProduct.quantity} onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })} />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Мярка</Label>
-                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" value={newProduct.unit} onChange={(e) => setNewProduct({ ...newProduct, unit: e.target.value })} />
+                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" placeholder="бр." value={newProduct.unit} onChange={(e) => setNewProduct({ ...newProduct, unit: e.target.value })} />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Цена</Label>
-                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={0} step={0.01} value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })} />
+                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={0} step={0.01} placeholder="0.00" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
                 </div>
               </div>
               <Button onClick={addProduct} className="w-full h-12 gap-2 rounded-xl gradient-bg hover:opacity-90 transition-opacity text-sm font-semibold">
