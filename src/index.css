@@ -92,6 +92,10 @@
     font-family: 'DM Sans', system-ui, sans-serif;
   }
 
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
   }
@@ -112,6 +116,10 @@
 
   .hover-lift {
     @apply transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md;
+  }
+
+  .safe-bottom {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
   }
 }
 
