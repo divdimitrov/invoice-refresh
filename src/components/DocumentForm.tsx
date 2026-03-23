@@ -417,7 +417,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">К-во</Label>
-                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={1} value={newProduct.quantity} onChange={(e) => setNewProduct({ ...newProduct, quantity: Number(e.target.value) })} />
+                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={1} placeholder="0" value={newProduct.quantity} onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })} />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Мярка</Label>
