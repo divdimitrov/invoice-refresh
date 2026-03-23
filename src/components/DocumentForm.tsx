@@ -89,8 +89,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
 
   const addProduct = () => {
     if (!newProduct.name.trim()) return;
-    setProducts([...products, { ...newProduct, id: crypto.randomUUID() }]);
-    setNewProduct({ name: "", quantity: 1, unit: "бр.", price: 0 });
+    const qty = Number(newProduct.quantity) || 0;
+    const prc = Number(newProduct.price) || 0;
+    setProducts([...products, { name: newProduct.name, quantity: qty, unit: newProduct.unit || "бр.", price: prc, id: crypto.randomUUID() }]);
+    setNewProduct({ name: "", quantity: "", unit: "", price: "" });
     toast.success("Продуктът е добавен");
   };
 
