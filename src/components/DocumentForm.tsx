@@ -338,7 +338,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 )}
               </div>
               <AnimatePresence>
-                {showClientDropdown && clientSearch.trim() && (
+                {showClientDropdown && (
                   <motion.div
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -347,9 +347,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                     className="relative z-20 mt-1 rounded-xl border bg-popover shadow-lg overflow-hidden"
                   >
                     {(() => {
-                      const filtered = clients.filter(c =>
-                        c.name.toLowerCase().includes(clientSearch.toLowerCase())
-                      );
+                      const sorted = [...clients].sort((a, b) => a.name.localeCompare(b.name, "bg"));
+                      const filtered = clientSearch.trim()
+                        ? sorted.filter(c => c.name.toLowerCase().includes(clientSearch.toLowerCase()))
+                        : sorted;
                       const exactMatch = clients.some(c => c.name.toLowerCase() === clientSearch.toLowerCase());
                       return (
                         <div className="max-h-48 overflow-y-auto">
