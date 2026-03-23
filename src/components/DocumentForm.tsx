@@ -228,10 +228,119 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               </div>
             </div>
 
+            {/* Client Picker */}
+            <div className="space-y-1.5" ref={clientSearchRef}>
+              <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                <Users className="h-3 w-3" />Клиент / Възложител
+              </Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 pointer-events-none" />
+                <Input
+                  className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30 pl-9"
+                  placeholder="Търси или въведи нов клиент..."
+                  value={clientSearch}
+                  onChange={(e) => {
+                    setClientSearch(e.target.value);
+                    setAssignor(e.target.value);
+                    setShowClientDropdown(true);
+                  }}
+                  onFocus={() => setShowClientDropdown(true)}
+                />
+                {selectedClient && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-destructive/10"
+                    onClick={() => {
+                      setClientSearch("");
+                      setAssignor("");
+                      setSignFor("");
+                      onSelectClient("");
+                    }}
+                  >
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                )}
+              </div>
+              <AnimatePresence>
+                {showClientDropdown && clientSearch.trim() && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    className="relative z-20 mt-1 rounded-xl border bg-popover shadow-lg overflow-hidden"
+                  >
+                    {(() => {
+                      const filtered = clients.filter(c =>
+                        c.name.toLowerCase().includes(clientSearch.toLowerCase())
+                      );
+                      const exactMatch = clients.some(c => c.name.toLowerCase() === clientSearch.toLowerCase());
+                      return (
+                        <div className="max-h-48 overflow-y-auto">
+                          {filtered.map(c => (
+                            <button
+                              key={c.id}
+                              className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent/60 transition-colors ${
+                                selectedClient?.id === c.id ? 'bg-accent' : ''
+                              }`}
+                              onClick={() => {
+                                onSelectClient(c.id);
+                                setClientSearch(c.name);
+                                setAssignor(c.name);
+                                setSignFor(c.contactPerson || "");
+                                setShowClientDropdown(false);
+                              }}
+                            >
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold shrink-0">
+                                {c.name.charAt(0)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{c.name}</p>
+                                {c.contactPerson && (
+                                  <p className="text-xs text-muted-foreground truncate">{c.contactPerson}</p>
+                                )}
+                              </div>
+                              {selectedClient?.id === c.id && (
+                                <Check className="h-4 w-4 text-primary shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                          {!exactMatch && clientSearch.trim() && (
+                            <button
+                              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent/60 transition-colors border-t"
+                              onClick={() => {
+                                const newClient = onAutoCreateClient({ name: clientSearch.trim() });
+                                setAssignor(newClient.name);
+                                setClientSearch(newClient.name);
+                                setShowClientDropdown(false);
+                                toast.success(`Клиентът "${newClient.name}" е създаден`);
+                              }}
+                            >
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-bg shrink-0">
+                                <UserPlus className="h-4 w-4 text-primary-foreground" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium">Създай „{clientSearch.trim()}"</p>
+                                <p className="text-xs text-muted-foreground">Нов клиент</p>
+                              </div>
+                            </button>
+                          )}
+                          {filtered.length === 0 && exactMatch && (
+                            <div className="px-4 py-3 text-sm text-muted-foreground text-center">Няма резултати</div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" />Възложител</Label>
-                <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Име на клиента" value={assignor} onChange={(e) => setAssignor(e.target.value)} />
+                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" />Възложител (за PDF)</Label>
+                <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Име във документа" value={assignor} onChange={(e) => setAssignor(e.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" />Изпълнител</Label>
