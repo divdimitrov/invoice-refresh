@@ -125,6 +125,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   });
 
   const handleExport = () => {
+    if (!docNumber.trim()) {
+      toast.error("Моля, въведете номер на документа");
+      return;
+    }
     exportPDF(getVersionData());
     toast.success("PDF файлът е генериран!");
   };
