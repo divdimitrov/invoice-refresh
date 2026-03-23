@@ -236,7 +236,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               }}
             >
               <X className="h-3.5 w-3.5" />
-              Смени
+              Премахни
             </Button>
           </motion.div>
         )}
