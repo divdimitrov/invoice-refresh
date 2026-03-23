@@ -25,6 +25,12 @@ const Index = () => {
   }, [selectedClientId]);
 
   const handleSelectClient = (id: string) => {
+    if (!id) {
+      setSelectedClientId(null);
+      setClientDocuments([]);
+      setEditingDocument(null);
+      return;
+    }
     setSelectedClientId(id);
     setClientDocuments(getClientDocuments(id));
     setEditingDocument(null);
