@@ -28,9 +28,14 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
   const [endDate, setEndDate] = useState("");
   const [signFor, setSignFor] = useState("");
   const [signBy, setSignBy] = useState("Александър Караманов");
-  const [protocolText, setProtocolText] = useState(
-    "Днес ...................... Подписаните, представители на Възложителя - ............................................. и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:"
-  );
+  const generateProtocolText = (date: string, assignorName: string, signForName: string) => {
+    const dateStr = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
+    const assignorStr = assignorName || ".............................................";
+    const signForStr = signForName || ".............................................";
+    return `Днес ${dateStr} Подписаните, ${signForStr} - представител на Възложителя - ${assignorStr} и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:`;
+  };
+
+  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: 1, unit: "бр.", price: 0 });
 
@@ -40,6 +45,13 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
       setSignFor(selectedClient.contactPerson || "");
     }
   }, [selectedClient, editingDocument]);
+
+  // Auto-update protocol text when relevant fields change (only for new docs)
+  useEffect(() => {
+    if (!editingDocument && docType === "protocol") {
+      setProtocolText(generateProtocolText(startDate, assignor, signFor));
+    }
+  }, [startDate, assignor, signFor, docType, editingDocument]);
 
   useEffect(() => {
     if (editingDocument) {
@@ -92,7 +104,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
     setEndDate("");
     setSignFor(selectedClient?.contactPerson || "");
     setSignBy("Александър Караманов");
-    setProtocolText("Днес ...................... Подписаните, представители на Възложителя - ............................................. и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:");
+    setProtocolText(generateProtocolText("", selectedClient?.name || "", selectedClient?.contactPerson || ""));
     setProducts([]);
     onClearEdit();
   };
@@ -226,10 +238,12 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">Текст на протокола</Label>
-              <Textarea rows={3} value={protocolText} onChange={(e) => setProtocolText(e.target.value)} className="resize-none text-sm rounded-xl bg-muted/40 border-transparent focus:border-primary/30" />
-            </div>
+            {docType === "protocol" && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">Текст на протокола</Label>
+                <Textarea rows={4} value={protocolText} onChange={(e) => setProtocolText(e.target.value)} className="resize-none text-sm rounded-xl bg-muted/40 border-transparent focus:border-primary/30" />
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
