@@ -134,7 +134,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
       const now = new Date().toISOString();
       saveDocument({
         id: crypto.randomUUID(),
-        clientId: selectedClient.id,
+        clientId: currentClient.id,
         title: `${docType === "protocol" ? "Протокол" : "Оферта"}${docNumber ? ` ${docNumber}` : ""}`,
         versions: [{ ...versionData, version: 1, savedAt: now }],
         createdAt: now,
