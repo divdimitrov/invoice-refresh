@@ -67,9 +67,9 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   // Auto-update protocol text when relevant fields change (only for new docs)
   useEffect(() => {
     if (!editingDocument && docType === "protocol") {
-      setProtocolText(generateProtocolText(startDate, signFor));
+      setProtocolText(generateProtocolText(startDate, signFor, endDate));
     }
-  }, [startDate, signFor, docType, editingDocument]);
+  }, [startDate, endDate, signFor, docType, editingDocument]);
 
   useEffect(() => {
     if (editingDocument) {
