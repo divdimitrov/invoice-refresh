@@ -491,7 +491,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       {/* Sticky bottom action bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 glass border-t safe-bottom">
         <div className="max-w-lg mx-auto p-3 flex gap-2.5">
-          <Button variant="outline" className="flex-1 h-13 gap-2 rounded-xl text-sm font-semibold border-primary/20 hover:bg-accent" onClick={handleExport}>
+          <Button variant="outline" className="flex-1 h-13 gap-2 rounded-xl text-sm font-semibold border-primary/20 hover:bg-accent" onClick={handleExport} disabled={products.length === 0}>
             <FileDown className="h-4.5 w-4.5" />
             Експорт PDF
           </Button>
