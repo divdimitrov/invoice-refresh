@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Save, FileDown, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw } from "lucide-react";
+import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { exportPDF } from "@/lib/pdf-export";
 import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
@@ -576,10 +576,6 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
         <div className="max-w-lg mx-auto p-3 flex gap-2">
           <Button variant="ghost" size="icon" className="h-13 w-13 shrink-0 rounded-xl hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors" onClick={() => { resetForm(); toast.info("Формата е нулирана"); }} title="Нулирай всичко">
             <RotateCcw className="h-4.5 w-4.5" />
-          </Button>
-          <Button variant="outline" className="flex-1 h-13 gap-2 rounded-xl text-sm font-semibold border-primary/20 hover:bg-accent" onClick={handleExport} disabled={products.length === 0}>
-            <FileDown className="h-4.5 w-4.5" />
-            PDF
           </Button>
           <Button className="flex-1 h-13 gap-2 rounded-xl text-sm font-semibold gradient-bg hover:opacity-90 transition-opacity glow" onClick={handleSave}>
             <Save className="h-4.5 w-4.5" />
