@@ -150,6 +150,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   };
 
   const handleSave = () => {
+    if (!docNumber.trim()) {
+      toast.error("Моля, въведете номер на документа");
+      return;
+    }
     let currentClient = selectedClient;
     
     // Auto-create client if no client selected but assignor is filled
