@@ -71,7 +71,6 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
             <Archive className="h-4 w-4 text-muted-foreground" />
           </div>
           <h2 className="text-[15px] font-semibold text-foreground">Документи</h2>
-          <span className="text-xs text-muted-foreground font-medium">({documents.length})</span>
         </div>
       </div>
       <CardContent className="px-5 pb-5 space-y-3">

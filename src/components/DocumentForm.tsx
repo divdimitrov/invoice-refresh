@@ -480,9 +480,6 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 <ShoppingBag className="h-4 w-4 text-accent-foreground" />
               </div>
               <h2 className="text-[15px] font-semibold text-foreground">Продукти</h2>
-              {products.length > 0 && (
-                <span className="text-xs text-muted-foreground font-medium">({products.length})</span>
-              )}
             </div>
           </div>
           <CardContent className="space-y-4 px-5 pb-5">
