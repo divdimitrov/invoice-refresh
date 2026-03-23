@@ -89,10 +89,25 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   }, [editingDocument]);
 
   const addProduct = () => {
-    if (!newProduct.name.trim()) return;
-    const qty = Number(newProduct.quantity) || 0;
-    const prc = Number(newProduct.price) || 0;
-    setProducts([...products, { name: newProduct.name, quantity: qty, unit: newProduct.unit || "бр.", price: prc, id: crypto.randomUUID() }]);
+    if (!newProduct.name.trim()) {
+      toast.error("Моля, въведете име на продукта");
+      return;
+    }
+    const qty = Number(newProduct.quantity);
+    const prc = Number(newProduct.price);
+    if (!qty || qty <= 0) {
+      toast.error("Моля, въведете количество");
+      return;
+    }
+    if (!newProduct.unit.trim()) {
+      toast.error("Моля, въведете мярка");
+      return;
+    }
+    if (!prc || prc <= 0) {
+      toast.error("Моля, въведете цена");
+      return;
+    }
+    setProducts([...products, { name: newProduct.name, quantity: qty, unit: newProduct.unit, price: prc, id: crypto.randomUUID() }]);
     setNewProduct({ name: "", quantity: "", unit: "", price: "" });
     toast.success("Продуктът е добавен");
   };
@@ -474,15 +489,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               <Input className="h-12 rounded-xl bg-card border-transparent focus:border-primary/30" placeholder="Име на продукта" value={newProduct.name} onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })} onKeyDown={(e) => e.key === "Enter" && addProduct()} />
               <div className="grid grid-cols-3 gap-2">
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">К-во</Label>
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">К-во <span className="text-destructive">*</span></Label>
                   <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={1} placeholder="0" value={newProduct.quantity} onChange={(e) => setNewProduct({ ...newProduct, quantity: e.target.value })} />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Мярка</Label>
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Мярка <span className="text-destructive">*</span></Label>
                   <Input className="h-11 rounded-xl bg-card border-transparent text-center" placeholder="бр." value={newProduct.unit} onChange={(e) => setNewProduct({ ...newProduct, unit: e.target.value })} />
                 </div>
                 <div className="space-y-1">
-                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Цена</Label>
+                  <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Цена <span className="text-destructive">*</span></Label>
                   <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={0} step={0.01} placeholder="0.00" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
                 </div>
               </div>

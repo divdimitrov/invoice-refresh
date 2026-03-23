@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { robotoRegular } from "./roboto-regular";
 import { robotoBold } from "./roboto-bold";
+import { logoBase64 } from "./logo-base64";
 
 interface Product {
   id: string;
@@ -40,7 +41,15 @@ export function exportPDF(data: DocumentData) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
   const contentWidth = pageWidth - margin * 2;
-  let y = 25;
+  let y = 20;
+
+  // === Logo ===
+  try {
+    doc.addImage(logoBase64, "PNG", margin, y - 5, 30, 30);
+  } catch (e) {
+    // skip logo if fails
+  }
+  y += 30;
 
   // === Header info: Възложител, Изпълнител, Обект ===
   doc.setFontSize(10);
