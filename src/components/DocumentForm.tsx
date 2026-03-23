@@ -170,6 +170,45 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
 
   return (
     <div className="space-y-5 pb-28">
+      {/* Active client banner */}
+      <AnimatePresence>
+        {selectedClient && !isEditing && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -10, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-primary/5 border border-primary/15"
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-bg text-primary-foreground font-bold text-sm shrink-0">
+              {selectedClient.name.charAt(0)}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-foreground truncate">{selectedClient.name}</p>
+              {selectedClient.contactPerson && (
+                <p className="text-xs text-muted-foreground truncate">{selectedClient.contactPerson}</p>
+              )}
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="shrink-0 h-9 gap-1.5 rounded-xl text-xs font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={() => {
+                onSelectClient("");
+                setClientSearch("");
+                setAssignor("");
+                setSignFor("");
+                resetForm();
+                toast.info("Клиентът е премахнат от формата");
+              }}
+            >
+              <X className="h-3.5 w-3.5" />
+              Смени
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -186,7 +225,9 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               ? <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent text-accent-foreground text-xs font-medium">
                   v{editingDocument.doc.versions[editingDocument.versionIndex].version} → v{editingDocument.doc.versions.length + 1}
                 </span>
-              : "Попълнете данните по-долу"}
+              : selectedClient
+                ? "Попълнете данните по-долу"
+                : "Изберете или създайте клиент"}
           </p>
         </div>
         {isEditing && (
