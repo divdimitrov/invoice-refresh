@@ -282,7 +282,11 @@ export function exportPDF(data: DocumentData) {
   doc.setFillColor(C.accent[0], C.accent[1], C.accent[2]);
   doc.rect(0, ph - 2.5, pw, 2.5, "F");
 
-  // Save
+  // Build result
   const fileName = `${data.docType === "protocol" ? "Протокол" : "Оферта"}${data.docNumber ? `_${data.docNumber}` : ""}.pdf`;
-  doc.save(fileName);
+  const blob = doc.output("blob");
+  const blobUrl = URL.createObjectURL(blob);
+  return { blob, blobUrl, fileName };
 }
+
+export type PdfResult = ReturnType<typeof exportPDF>;

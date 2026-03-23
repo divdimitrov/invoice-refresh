@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Trash2, Clock, ChevronDown, Search, Filter, Archive } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { exportPDF } from "@/lib/pdf-export";
+import { exportPDF, type PdfResult } from "@/lib/pdf-export";
+import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
 import { toast } from "sonner";
 import { useState, useMemo } from "react";
 
@@ -19,6 +20,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
 
   const filtered = useMemo(() => {
     return documents.filter((doc) => {
@@ -45,13 +47,17 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
 
   const handleExportVersion = (doc: SavedDocument, versionIdx: number) => {
     const v = doc.versions[versionIdx];
-    exportPDF({
+    setPdfPreview(exportPDF({
       docType: v.docType, docNumber: v.docNumber, assignor: v.assignor,
       executor: v.executor, object: v.object, startDate: v.startDate,
       endDate: v.endDate, signFor: v.signFor, signBy: v.signBy,
       protocolText: v.protocolText, products: v.products,
-    });
-    toast.success("PDF е генериран");
+    }));
+  };
+
+  const closePdfPreview = () => {
+    if (pdfPreview) URL.revokeObjectURL(pdfPreview.blobUrl);
+    setPdfPreview(null);
   };
 
   if (documents.length === 0) {
@@ -69,6 +75,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
   }
 
   return (
+    <>
     <Card className="card-elevated overflow-hidden">
       <div className="px-5 pt-5 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
@@ -201,5 +208,15 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
         </AnimatePresence>
       </CardContent>
     </Card>
+    {pdfPreview && (
+      <PdfPreviewDialog
+        open
+        onClose={closePdfPreview}
+        blobUrl={pdfPreview.blobUrl}
+        fileName={pdfPreview.fileName}
+        blob={pdfPreview.blob}
+      />
+    )}
+    </>
   );
 }

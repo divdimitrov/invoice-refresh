@@ -8,7 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import { exportPDF } from "@/lib/pdf-export";
+import { exportPDF, type PdfResult } from "@/lib/pdf-export";
+import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
 import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
 
 interface DocumentFormProps {
@@ -48,6 +49,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: "" as string | number, unit: "", price: "" as string | number });
   const [isSaving, setIsSaving] = useState(false);
+  const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
 
   useEffect(() => {
     if (selectedClient && !editingDocument) {
@@ -136,8 +138,12 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       toast.error("Моля, въведете номер на документа");
       return;
     }
-    exportPDF(getVersionData());
-    toast.success("PDF файлът е генериран!");
+    setPdfPreview(exportPDF(getVersionData()));
+  };
+
+  const closePdfPreview = () => {
+    if (pdfPreview) URL.revokeObjectURL(pdfPreview.blobUrl);
+    setPdfPreview(null);
   };
 
   const resetForm = () => {
@@ -226,7 +232,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
 
   const isEditing = !!editingDocument;
 
-  return (
+  const content = (
     <div className="space-y-5 pb-28">
       {/* Active client banner */}
       <AnimatePresence>
@@ -641,5 +647,20 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
         </div>
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {content}
+      {pdfPreview && (
+        <PdfPreviewDialog
+          open
+          onClose={closePdfPreview}
+          blobUrl={pdfPreview.blobUrl}
+          fileName={pdfPreview.fileName}
+          blob={pdfPreview.blob}
+        />
+      )}
+    </>
   );
 }
