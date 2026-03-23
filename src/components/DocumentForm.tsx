@@ -16,6 +16,7 @@ interface DocumentFormProps {
   editingDocument: { doc: SavedDocument; versionIndex: number } | null;
   onClearEdit: () => void;
   onDocumentSaved: () => void;
+  onAutoCreateClient: (clientData: Omit<Client, "id">) => Client;
 }
 
 export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onDocumentSaved }: DocumentFormProps) {
