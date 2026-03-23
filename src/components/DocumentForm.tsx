@@ -343,7 +343,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
                       </div>
                       <div className="text-right shrink-0">
                         <p className="font-bold text-sm">{(p.quantity * p.price).toFixed(2)}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium">лв.</p>
+                        <p className="text-[10px] text-muted-foreground font-medium">€</p>
                       </div>
                       <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-xl opacity-50 group-hover:opacity-100 transition-opacity" onClick={() => removeProduct(p.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
