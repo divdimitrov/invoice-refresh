@@ -194,7 +194,8 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
               )}
             </div>
           );
-        })}
+        })
+        }
       </CardContent>
     </Card>
   );
