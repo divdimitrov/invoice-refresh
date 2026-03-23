@@ -25,6 +25,12 @@ const Index = () => {
   }, [selectedClientId]);
 
   const handleSelectClient = (id: string) => {
+    if (!id) {
+      setSelectedClientId(null);
+      setClientDocuments([]);
+      setEditingDocument(null);
+      return;
+    }
     setSelectedClientId(id);
     setClientDocuments(getClientDocuments(id));
     setEditingDocument(null);
@@ -102,11 +108,13 @@ const Index = () => {
       {/* Content */}
       <main className="px-4 py-5 max-w-lg mx-auto space-y-5">
         <DocumentForm
+          clients={clients}
           selectedClient={selectedClient}
           editingDocument={editingDocument}
           onClearEdit={() => setEditingDocument(null)}
           onDocumentSaved={refreshDocuments}
           onAutoCreateClient={handleAutoCreateClient}
+          onSelectClient={handleSelectClient}
         />
 
         <AnimatePresence>

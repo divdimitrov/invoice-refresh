@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,20 +6,22 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Save, FileDown, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag } from "lucide-react";
+import { Plus, Trash2, Save, FileDown, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check } from "lucide-react";
 import { toast } from "sonner";
 import { exportPDF } from "@/lib/pdf-export";
 import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
 
 interface DocumentFormProps {
+  clients: Client[];
   selectedClient: Client | null;
   editingDocument: { doc: SavedDocument; versionIndex: number } | null;
   onClearEdit: () => void;
   onDocumentSaved: () => void;
   onAutoCreateClient: (clientData: Omit<Client, "id">) => Client;
+  onSelectClient: (id: string) => void;
 }
 
-export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient }: DocumentFormProps) {
+export function DocumentForm({ clients, selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient, onSelectClient }: DocumentFormProps) {
   const [docType, setDocType] = useState("protocol");
   const [docNumber, setDocNumber] = useState("");
   const [assignor, setAssignor] = useState("");
@@ -29,6 +31,9 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
   const [endDate, setEndDate] = useState("");
   const [signFor, setSignFor] = useState("");
   const [signBy, setSignBy] = useState("Александър Караманов");
+  const [clientSearch, setClientSearch] = useState("");
+  const [showClientDropdown, setShowClientDropdown] = useState(false);
+  const clientSearchRef = useRef<HTMLDivElement>(null);
   const generateProtocolText = (date: string, signForName: string) => {
     const dateStr = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
     const signForStr = signForName || ".............................................";
@@ -43,8 +48,20 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
     if (selectedClient && !editingDocument) {
       setAssignor(selectedClient.name);
       setSignFor(selectedClient.contactPerson || "");
+      setClientSearch(selectedClient.name);
     }
   }, [selectedClient, editingDocument]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (clientSearchRef.current && !clientSearchRef.current.contains(e.target as Node)) {
+        setShowClientDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   // Auto-update protocol text when relevant fields change (only for new docs)
   useEffect(() => {
@@ -98,6 +115,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
     setDocType("protocol");
     setDocNumber("");
     setAssignor(selectedClient?.name || "");
+    setClientSearch(selectedClient?.name || "");
     setExecutor("Александър Строй ЕООД");
     setObject("");
     setStartDate("");
@@ -166,9 +184,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
               ? <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent text-accent-foreground text-xs font-medium">
                   v{editingDocument.doc.versions[editingDocument.versionIndex].version} → v{editingDocument.doc.versions.length + 1}
                 </span>
-              : selectedClient
-                ? `Клиент: ${selectedClient.name}`
-                : "Изберете клиент от менюто"}
+              : "Попълнете данните по-долу"}
           </p>
         </div>
         {isEditing && (
@@ -211,10 +227,119 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
               </div>
             </div>
 
+            {/* Client Picker */}
+            <div className="space-y-1.5" ref={clientSearchRef}>
+              <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                <Users className="h-3 w-3" />Клиент / Възложител
+              </Label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60 pointer-events-none" />
+                <Input
+                  className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30 pl-9"
+                  placeholder="Търси или въведи нов клиент..."
+                  value={clientSearch}
+                  onChange={(e) => {
+                    setClientSearch(e.target.value);
+                    setAssignor(e.target.value);
+                    setShowClientDropdown(true);
+                  }}
+                  onFocus={() => setShowClientDropdown(true)}
+                />
+                {selectedClient && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-destructive/10"
+                    onClick={() => {
+                      setClientSearch("");
+                      setAssignor("");
+                      setSignFor("");
+                      onSelectClient("");
+                    }}
+                  >
+                    <X className="h-3.5 w-3.5 text-muted-foreground" />
+                  </Button>
+                )}
+              </div>
+              <AnimatePresence>
+                {showClientDropdown && clientSearch.trim() && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }}
+                    transition={{ duration: 0.15 }}
+                    className="relative z-20 mt-1 rounded-xl border bg-popover shadow-lg overflow-hidden"
+                  >
+                    {(() => {
+                      const filtered = clients.filter(c =>
+                        c.name.toLowerCase().includes(clientSearch.toLowerCase())
+                      );
+                      const exactMatch = clients.some(c => c.name.toLowerCase() === clientSearch.toLowerCase());
+                      return (
+                        <div className="max-h-48 overflow-y-auto">
+                          {filtered.map(c => (
+                            <button
+                              key={c.id}
+                              className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent/60 transition-colors ${
+                                selectedClient?.id === c.id ? 'bg-accent' : ''
+                              }`}
+                              onClick={() => {
+                                onSelectClient(c.id);
+                                setClientSearch(c.name);
+                                setAssignor(c.name);
+                                setSignFor(c.contactPerson || "");
+                                setShowClientDropdown(false);
+                              }}
+                            >
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary text-xs font-bold shrink-0">
+                                {c.name.charAt(0)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium truncate">{c.name}</p>
+                                {c.contactPerson && (
+                                  <p className="text-xs text-muted-foreground truncate">{c.contactPerson}</p>
+                                )}
+                              </div>
+                              {selectedClient?.id === c.id && (
+                                <Check className="h-4 w-4 text-primary shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                          {!exactMatch && clientSearch.trim() && (
+                            <button
+                              className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent/60 transition-colors border-t"
+                              onClick={() => {
+                                const newClient = onAutoCreateClient({ name: clientSearch.trim() });
+                                setAssignor(newClient.name);
+                                setClientSearch(newClient.name);
+                                setShowClientDropdown(false);
+                                toast.success(`Клиентът "${newClient.name}" е създаден`);
+                              }}
+                            >
+                              <div className="flex h-8 w-8 items-center justify-center rounded-lg gradient-bg shrink-0">
+                                <UserPlus className="h-4 w-4 text-primary-foreground" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium">Създай „{clientSearch.trim()}"</p>
+                                <p className="text-xs text-muted-foreground">Нов клиент</p>
+                              </div>
+                            </button>
+                          )}
+                          {filtered.length === 0 && exactMatch && (
+                            <div className="px-4 py-3 text-sm text-muted-foreground text-center">Няма резултати</div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" />Възложител</Label>
-                <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Име на клиента" value={assignor} onChange={(e) => setAssignor(e.target.value)} />
+                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" />Възложител (за PDF)</Label>
+                <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Име във документа" value={assignor} onChange={(e) => setAssignor(e.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" />Изпълнител</Label>
