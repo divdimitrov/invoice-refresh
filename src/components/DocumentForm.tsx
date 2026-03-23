@@ -48,8 +48,20 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     if (selectedClient && !editingDocument) {
       setAssignor(selectedClient.name);
       setSignFor(selectedClient.contactPerson || "");
+      setClientSearch(selectedClient.name);
     }
   }, [selectedClient, editingDocument]);
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (clientSearchRef.current && !clientSearchRef.current.contains(e.target as Node)) {
+        setShowClientDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   // Auto-update protocol text when relevant fields change (only for new docs)
   useEffect(() => {
