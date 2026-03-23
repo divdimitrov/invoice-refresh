@@ -115,6 +115,7 @@ const Index = () => {
           onDocumentSaved={refreshDocuments}
           onAutoCreateClient={handleAutoCreateClient}
           onSelectClient={handleSelectClient}
+          onEditClient={handleEditClient}
         />
 
         <AnimatePresence>

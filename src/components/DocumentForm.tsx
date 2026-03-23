@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { exportPDF } from "@/lib/pdf-export";
-import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
+import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument, updateClient } from "@/lib/storage";
 
 interface DocumentFormProps {
   clients: Client[];
@@ -19,9 +19,10 @@ interface DocumentFormProps {
   onDocumentSaved: () => void;
   onAutoCreateClient: (clientData: Omit<Client, "id">) => Client;
   onSelectClient: (id: string) => void;
+  onEditClient: (client: Client) => void;
 }
 
-export function DocumentForm({ clients, selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient, onSelectClient }: DocumentFormProps) {
+export function DocumentForm({ clients, selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient, onSelectClient, onEditClient }: DocumentFormProps) {
   const [docType, setDocType] = useState("protocol");
   const [docNumber, setDocNumber] = useState("");
   const [assignor, setAssignor] = useState("");
@@ -33,7 +34,9 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [signBy, setSignBy] = useState("Александър Караманов");
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
+  const [showRepDropdown, setShowRepDropdown] = useState(false);
   const clientSearchRef = useRef<HTMLDivElement>(null);
+  const repRef = useRef<HTMLDivElement>(null);
   const generateProtocolText = (date: string, signForName: string, endDateStr: string) => {
     const dateFormatted = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
     const endDateFormatted = endDateStr ? new Date(endDateStr).toLocaleDateString("bg-BG") : "......................";
@@ -58,6 +61,9 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     const handler = (e: MouseEvent) => {
       if (clientSearchRef.current && !clientSearchRef.current.contains(e.target as Node)) {
         setShowClientDropdown(false);
+      }
+      if (repRef.current && !repRef.current.contains(e.target as Node)) {
+        setShowRepDropdown(false);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -169,6 +175,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       toast.error("Моля, изберете клиент или въведете Възложител");
       return;
     }
+    // Auto-save representative to client
+    if (signFor.trim() && currentClient) {
+      const reps = currentClient.representatives || [];
+      if (!reps.includes(signFor.trim())) {
+        const updatedClient = { ...currentClient, representatives: [...reps, signFor.trim()] };
+        onEditClient(updatedClient);
+      }
+    }
+
     const versionData = getVersionData();
     if (editingDocument) {
       addVersionToDocument(editingDocument.doc.id, versionData);
@@ -448,9 +463,40 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 relative" ref={repRef}>
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" />За Възложителя</Label>
-                <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Име" value={signFor} onChange={(e) => setSignFor(e.target.value)} />
+                <Input
+                  className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30"
+                  placeholder="Име"
+                  value={signFor}
+                  onChange={(e) => { setSignFor(e.target.value); setShowRepDropdown(true); }}
+                  onFocus={() => setShowRepDropdown(true)}
+                />
+                <AnimatePresence>
+                  {showRepDropdown && selectedClient?.representatives && selectedClient.representatives.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute z-20 left-0 right-0 mt-1 rounded-xl border bg-popover shadow-lg overflow-hidden"
+                    >
+                      <div className="max-h-36 overflow-y-auto">
+                        {selectedClient.representatives
+                          .filter(r => !signFor.trim() || r.toLowerCase().includes(signFor.toLowerCase()))
+                          .map((rep, idx) => (
+                            <button
+                              key={idx}
+                              className={`w-full px-4 py-2.5 text-left text-sm hover:bg-accent/60 transition-colors ${signFor === rep ? 'bg-accent font-medium' : ''}`}
+                              onClick={() => { setSignFor(rep); setShowRepDropdown(false); }}
+                            >
+                              {rep}
+                            </button>
+                          ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" />За Изпълнителя</Label>
