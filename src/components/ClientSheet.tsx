@@ -13,9 +13,9 @@ interface ClientSheetProps {
   clients: Client[];
   selectedClient: string | null;
   onSelectClient: (id: string) => void;
-  onAddClient: (client: Omit<Client, "id">) => void;
-  onDeleteClient: (id: string) => void;
-  onEditClient: (client: Client) => void;
+  onAddClient: (client: Omit<Client, "id">) => void | Promise<void>;
+  onDeleteClient: (id: string) => void | Promise<void>;
+  onEditClient: (client: Client) => void | Promise<void>;
 }
 
 export function ClientSheet({

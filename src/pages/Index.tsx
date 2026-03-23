@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ClientSheet } from "@/components/ClientSheet";
 import { DocumentForm } from "@/components/DocumentForm";
 import { SavedDocuments } from "@/components/SavedDocuments";
 import { Sparkles, FileText } from "lucide-react";
+import { toast } from "sonner";
 import {
   type Client, type SavedDocument,
   getClients, addClient as storageAddClient, deleteClient as storageDeleteClient, updateClient,
@@ -11,16 +12,36 @@ import {
 } from "@/lib/storage";
 
 const Index = () => {
-  const [clients, setClients] = useState<Client[]>(getClients);
+  const [clients, setClients] = useState<Client[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [clientDocuments, setClientDocuments] = useState<SavedDocument[]>([]);
   const [editingDocument, setEditingDocument] = useState<{ doc: SavedDocument; versionIndex: number } | null>(null);
 
   const selectedClient = clients.find(c => c.id === selectedClientId) || null;
 
-  const refreshDocuments = useCallback(() => {
-    if (selectedClientId) {
-      setClientDocuments(getClientDocuments(selectedClientId));
+  useEffect(() => {
+    (async () => {
+      try {
+        const loaded = await getClients();
+        setClients(loaded);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Failed to load clients";
+        toast.error(message);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const refreshDocuments = useCallback(async () => {
+    if (!selectedClientId) return;
+    try {
+      const docs = await getClientDocuments(selectedClientId);
+      setClientDocuments(docs);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to load documents";
+      toast.error(message);
     }
   }, [selectedClientId]);
 
@@ -32,27 +53,53 @@ const Index = () => {
       return;
     }
     setSelectedClientId(id);
-    setClientDocuments(getClientDocuments(id));
+    (async () => {
+      try {
+        const docs = await getClientDocuments(id);
+        setClientDocuments(docs);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Failed to load documents";
+        toast.error(message);
+      }
+    })();
     setEditingDocument(null);
   };
 
-  const handleAddClient = (clientData: Omit<Client, "id">): Client => {
+  const handleAddClient = async (clientData: Omit<Client, "id">): Promise<Client> => {
     const client: Client = { ...clientData, id: crypto.randomUUID() };
-    const updated = storageAddClient(client);
-    setClients(updated);
+    try {
+      const updated = await storageAddClient(client);
+      setClients(updated);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to add client";
+      toast.error(message);
+      throw e;
+    }
     return client;
   };
 
-  const handleAutoCreateClient = (clientData: Omit<Client, "id">): Client => {
-    const client = handleAddClient(clientData);
+  const handleAutoCreateClient = async (clientData: Omit<Client, "id">): Promise<Client> => {
+    const client = await handleAddClient(clientData);
     setSelectedClientId(client.id);
-    setClientDocuments(getClientDocuments(client.id));
+    try {
+      const docs = await getClientDocuments(client.id);
+      setClientDocuments(docs);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to load documents";
+      toast.error(message);
+    }
     return client;
   };
 
-  const handleDeleteClient = (id: string) => {
-    const updated = storageDeleteClient(id);
-    setClients(updated);
+  const handleDeleteClient = async (id: string) => {
+    try {
+      const updated = await storageDeleteClient(id);
+      setClients(updated);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to delete client";
+      toast.error(message);
+      return;
+    }
     if (selectedClientId === id) {
       setSelectedClientId(null);
       setClientDocuments([]);
@@ -60,9 +107,14 @@ const Index = () => {
     }
   };
 
-  const handleEditClient = (client: Client) => {
-    const updated = updateClient(client);
-    setClients(updated);
+  const handleEditClient = async (client: Client) => {
+    try {
+      const updated = await updateClient(client);
+      setClients(updated);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to update client";
+      toast.error(message);
+    }
   };
 
   const handleEditDocument = (doc: SavedDocument, versionIndex: number) => {
@@ -107,6 +159,12 @@ const Index = () => {
 
       {/* Content */}
       <main className="px-4 py-5 max-w-lg mx-auto space-y-5">
+        {loading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          </div>
+        ) : (
+        <>
         <DocumentForm
           clients={clients}
           selectedClient={selectedClient}
@@ -135,6 +193,8 @@ const Index = () => {
             </motion.div>
           )}
         </AnimatePresence>
+        </>
+        )}
       </main>
     </div>
   );

@@ -9,17 +9,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { exportPDF } from "@/lib/pdf-export";
-import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument, updateClient } from "@/lib/storage";
+import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
 
 interface DocumentFormProps {
   clients: Client[];
   selectedClient: Client | null;
   editingDocument: { doc: SavedDocument; versionIndex: number } | null;
   onClearEdit: () => void;
-  onDocumentSaved: () => void;
-  onAutoCreateClient: (clientData: Omit<Client, "id">) => Client;
+  onDocumentSaved: () => void | Promise<void>;
+  onAutoCreateClient: (clientData: Omit<Client, "id">) => Promise<Client>;
   onSelectClient: (id: string) => void;
-  onEditClient: (client: Client) => void;
+  onEditClient: (client: Client) => void | Promise<void>;
 }
 
 export function DocumentForm({ clients, selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient, onSelectClient, onEditClient }: DocumentFormProps) {
@@ -47,6 +47,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: "" as string | number, unit: "", price: "" as string | number });
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (selectedClient && !editingDocument) {
@@ -155,20 +156,28 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     onClearEdit();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (isSaving) return;
     if (!docNumber.trim()) {
       toast.error("Моля, въведете номер на документа");
       return;
     }
+    setIsSaving(true);
+    try {
     let currentClient = selectedClient;
     
     // Auto-create client if no client selected but assignor is filled
     if (!currentClient && assignor.trim()) {
-      currentClient = onAutoCreateClient({
-        name: assignor.trim(),
-        contactPerson: signFor.trim() || undefined,
-      });
-      toast.success(`Клиентът "${assignor.trim()}" е създаден автоматично`);
+      try {
+        currentClient = await onAutoCreateClient({
+          name: assignor.trim(),
+          contactPerson: signFor.trim() || undefined,
+        });
+        toast.success(`Клиентът "${assignor.trim()}" е създаден автоматично`);
+      } catch {
+        // onAutoCreateClient already toasts errors
+        return;
+      }
     }
     
     if (!currentClient) {
@@ -180,29 +189,39 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       const reps = currentClient.representatives || [];
       if (!reps.includes(signFor.trim())) {
         const updatedClient = { ...currentClient, representatives: [...reps, signFor.trim()] };
-        onEditClient(updatedClient);
+        await onEditClient(updatedClient);
       }
     }
 
     const versionData = getVersionData();
-    if (editingDocument) {
-      addVersionToDocument(editingDocument.doc.id, versionData);
-      toast.success(`Нова версия v${editingDocument.doc.versions.length + 1} е запазена!`);
-      onClearEdit();
-    } else {
-      const now = new Date().toISOString();
-      saveDocument({
-        id: crypto.randomUUID(),
-        clientId: currentClient.id,
-        title: `${docType === "protocol" ? "Протокол" : "Оферта"}${docNumber ? ` ${docNumber}` : ""}`,
-        versions: [{ ...versionData, version: 1, savedAt: now }],
-        createdAt: now,
-        updatedAt: now,
-      });
-      toast.success("Документът е запазен!");
+      if (editingDocument) {
+        const res = await addVersionToDocument(editingDocument.doc.id, versionData);
+        if (!res) {
+          toast.error("Документът не е намерен");
+          return;
+        }
+        toast.success(`Нова версия v${res.newVersionNumber} е запазена!`);
+        onClearEdit();
+      } else {
+        const now = new Date().toISOString();
+        await saveDocument({
+          id: crypto.randomUUID(),
+          clientId: currentClient.id,
+          title: `${docType === "protocol" ? "Протокол" : "Оферта"}${docNumber ? ` ${docNumber}` : ""}`,
+          versions: [{ ...versionData, version: 1, savedAt: now }],
+          createdAt: now,
+          updatedAt: now,
+        });
+        toast.success("Документът е запазен!");
+      }
+      await onDocumentSaved();
+      resetForm();
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Save failed";
+      toast.error(message);
+    } finally {
+      setIsSaving(false);
     }
-    onDocumentSaved();
-    resetForm();
   };
 
   const isEditing = !!editingDocument;

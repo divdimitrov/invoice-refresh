@@ -11,7 +11,7 @@ import { useState, useMemo } from "react";
 
 interface SavedDocumentsProps {
   documents: SavedDocument[];
-  onDocumentsChange: () => void;
+  onDocumentsChange: () => void | Promise<void>;
   onEditDocument: (doc: SavedDocument, versionIndex: number) => void;
 }
 
@@ -32,10 +32,15 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
     });
   }, [documents, search, typeFilter]);
 
-  const handleDelete = (id: string) => {
-    deleteDocument(id);
-    onDocumentsChange();
-    toast.info("Документът е изтрит");
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteDocument(id);
+      await onDocumentsChange();
+      toast.info("Документът е изтрит");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to delete";
+      toast.error(message);
+    }
   };
 
   const handleExportVersion = (doc: SavedDocument, versionIdx: number) => {

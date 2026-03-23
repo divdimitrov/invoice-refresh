@@ -1,3 +1,5 @@
+import { supabase } from "@/lib/supabase";
+
 export interface Client {
   id: string;
   name: string;
@@ -41,88 +43,225 @@ export interface SavedDocument {
   updatedAt: string;
 }
 
-const CLIENTS_KEY = "invoice_clients";
-const DOCUMENTS_KEY = "invoice_documents";
+type DbClientRow = {
+  id: string;
+  name: string;
+  contact_person: string | null;
+  representatives: string[] | null;
+  address: string | null;
+  phone: string | null;
+  email: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+type DbDocumentRow = {
+  id: string;
+  client_id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+};
+
+type DbVersionRow = {
+  id: string;
+  document_id: string;
+  version: number;
+  saved_at: string;
+  data: Record<string, unknown>;
+  created_at: string;
+};
+
+function mapClient(row: DbClientRow): Client {
+  return {
+    id: row.id,
+    name: row.name,
+    contactPerson: row.contact_person || undefined,
+    representatives: row.representatives || undefined,
+    address: row.address || undefined,
+    phone: row.phone || undefined,
+    email: row.email || undefined,
+  };
+}
+
+function mapVersion(row: DbVersionRow): DocumentVersion {
+  const data = row.data as Partial<Omit<DocumentVersion, "version" | "savedAt">>;
+  return {
+    version: row.version,
+    savedAt: row.saved_at,
+    docType: data.docType || "protocol",
+    docNumber: data.docNumber || "",
+    assignor: data.assignor || "",
+    executor: data.executor || "",
+    object: data.object || "",
+    startDate: data.startDate || "",
+    endDate: data.endDate || "",
+    signFor: data.signFor || "",
+    signBy: data.signBy || "",
+    protocolText: data.protocolText || "",
+    products: (data.products as Product[]) || [],
+  };
+}
+
+function titleFromVersion(v: Pick<DocumentVersion, "docType" | "docNumber">) {
+  return `${v.docType === "protocol" ? "Протокол" : "Оферта"}${v.docNumber ? ` ${v.docNumber}` : ""}`;
+}
+
+function versionDataPayload(v: Omit<DocumentVersion, "version" | "savedAt">) {
+  return {
+    docType: v.docType,
+    docNumber: v.docNumber,
+    assignor: v.assignor,
+    executor: v.executor,
+    object: v.object,
+    startDate: v.startDate,
+    endDate: v.endDate,
+    signFor: v.signFor,
+    signBy: v.signBy,
+    protocolText: v.protocolText,
+    products: v.products,
+  };
+}
+
+async function requireOk<T>(
+  p: Promise<{ data: T | null; error: { message: string } | null }>,
+  context: string
+): Promise<T> {
+  const { data, error } = await p;
+  if (error) throw new Error(`${context}: ${error.message}`);
+  if (data === null) throw new Error(`${context}: empty response`);
+  return data;
+}
+
+async function requireNoError(
+  p: Promise<{ error: { message: string } | null }>,
+  context: string
+): Promise<void> {
+  const { error } = await p;
+  if (error) throw new Error(`${context}: ${error.message}`);
+}
 
 // Clients
-export function getClients(): Client[] {
-  try {
-    return JSON.parse(localStorage.getItem(CLIENTS_KEY) || "[]");
-  } catch { return []; }
+export async function getClients(): Promise<Client[]> {
+  const data = await requireOk(
+    supabase.from("clients").select("*").order("created_at", { ascending: true }),
+    "getClients"
+  );
+  return (data as DbClientRow[]).map(mapClient);
 }
 
-export function saveClients(clients: Client[]) {
-  localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
+export async function addClient(client: Client): Promise<Client[]> {
+  await requireNoError(
+    supabase.from("clients").insert({
+      id: client.id,
+      name: client.name,
+      contact_person: client.contactPerson ?? null,
+      representatives: client.representatives ?? [],
+      address: client.address ?? null,
+      phone: client.phone ?? null,
+      email: client.email ?? null,
+    }),
+    "addClient"
+  );
+  return getClients();
 }
 
-export function addClient(client: Client) {
-  const clients = getClients();
-  clients.push(client);
-  saveClients(clients);
-  return clients;
+export async function updateClient(client: Client): Promise<Client[]> {
+  await requireNoError(
+    supabase
+      .from("clients")
+      .update({
+        name: client.name,
+        contact_person: client.contactPerson ?? null,
+        representatives: client.representatives ?? [],
+        address: client.address ?? null,
+        phone: client.phone ?? null,
+        email: client.email ?? null,
+      })
+      .eq("id", client.id),
+    "updateClient"
+  );
+  return getClients();
 }
 
-export function updateClient(client: Client) {
-  const clients = getClients().map(c => c.id === client.id ? client : c);
-  saveClients(clients);
-  return clients;
-}
-
-export function deleteClient(id: string) {
-  const clients = getClients().filter(c => c.id !== id);
-  saveClients(clients);
-  // Also delete associated documents
-  const docs = getDocuments().filter(d => d.clientId !== id);
-  saveDocuments(docs);
-  return clients;
+export async function deleteClient(id: string): Promise<Client[]> {
+  await requireNoError(supabase.from("clients").delete().eq("id", id), "deleteClient");
+  return getClients();
 }
 
 // Documents
-export function getDocuments(): SavedDocument[] {
-  try {
-    return JSON.parse(localStorage.getItem(DOCUMENTS_KEY) || "[]");
-  } catch { return []; }
+export async function getClientDocuments(clientId: string): Promise<SavedDocument[]> {
+  // Single round-trip: fetch documents with nested versions via Supabase relation query
+  const rows = await requireOk(
+    supabase
+      .from("documents")
+      .select("*, document_versions(*)")
+      .eq("client_id", clientId)
+      .order("updated_at", { ascending: false }),
+    "getClientDocuments"
+  );
+
+  type DocWithVersions = DbDocumentRow & { document_versions: DbVersionRow[] };
+  const docRows = rows as DocWithVersions[];
+
+  return docRows.map((d) => {
+    const sortedVersions = [...d.document_versions]
+      .sort((a, b) => a.version - b.version)
+      .map(mapVersion);
+    return {
+      id: d.id,
+      clientId: d.client_id,
+      title: d.title,
+      versions: sortedVersions,
+      createdAt: d.created_at,
+      updatedAt: d.updated_at,
+    };
+  });
 }
 
-export function saveDocuments(docs: SavedDocument[]) {
-  localStorage.setItem(DOCUMENTS_KEY, JSON.stringify(docs));
+export async function saveDocument(doc: SavedDocument): Promise<void> {
+  await requireNoError(
+    supabase.from("documents").insert({
+      id: doc.id,
+      client_id: doc.clientId,
+      title: doc.title,
+      created_at: doc.createdAt,
+      updated_at: doc.updatedAt,
+    }),
+    "saveDocument.documents"
+  );
+
+  const versionsToInsert = doc.versions.map((v) => ({
+    document_id: doc.id,
+    version: v.version,
+    saved_at: v.savedAt,
+    data: versionDataPayload(v),
+  }));
+
+  await requireNoError(
+    supabase.from("document_versions").insert(versionsToInsert),
+    "saveDocument.versions"
+  );
 }
 
-export function getClientDocuments(clientId: string): SavedDocument[] {
-  return getDocuments().filter(d => d.clientId === clientId);
+export async function deleteDocument(id: string): Promise<void> {
+  await requireNoError(supabase.from("documents").delete().eq("id", id), "deleteDocument");
 }
 
-export function saveDocument(doc: SavedDocument) {
-  const docs = getDocuments();
-  const idx = docs.findIndex(d => d.id === doc.id);
-  if (idx >= 0) {
-    docs[idx] = doc;
-  } else {
-    docs.push(doc);
-  }
-  saveDocuments(docs);
-  return docs;
-}
+export async function addVersionToDocument(
+  docId: string,
+  version: Omit<DocumentVersion, "version" | "savedAt">
+): Promise<{ newVersionNumber: number } | null> {
+  const newTitle = titleFromVersion(version);
 
-export function deleteDocument(id: string) {
-  const docs = getDocuments().filter(d => d.id !== id);
-  saveDocuments(docs);
-  return docs;
-}
+  // Atomic: version numbering + insert + title update all happen inside Postgres
+  const { data, error } = await supabase.rpc("add_document_version", {
+    p_document_id: docId,
+    p_data: versionDataPayload(version),
+    p_title: newTitle,
+  });
 
-export function addVersionToDocument(docId: string, version: Omit<DocumentVersion, "version" | "savedAt">): SavedDocument | null {
-  const docs = getDocuments();
-  const doc = docs.find(d => d.id === docId);
-  if (!doc) return null;
-  
-  const newVersion: DocumentVersion = {
-    ...version,
-    version: doc.versions.length + 1,
-    savedAt: new Date().toISOString(),
-  };
-  doc.versions.push(newVersion);
-  doc.updatedAt = new Date().toISOString();
-  doc.title = `${version.docType === "protocol" ? "Протокол" : "Оферта"}${version.docNumber ? ` ${version.docNumber}` : ""}`;
-  saveDocuments(docs);
-  return doc;
+  if (error) throw new Error(`addVersionToDocument: ${error.message}`);
+  const nextVersion = data as number;
+  return { newVersionNumber: nextVersion };
 }
