@@ -184,9 +184,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               ? <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-accent text-accent-foreground text-xs font-medium">
                   v{editingDocument.doc.versions[editingDocument.versionIndex].version} → v{editingDocument.doc.versions.length + 1}
                 </span>
-              : selectedClient
-                ? `Клиент: ${selectedClient.name}`
-                : "Изберете клиент от менюто"}
+              : "Попълнете данните по-долу"}
           </p>
         </div>
         {isEditing && (
