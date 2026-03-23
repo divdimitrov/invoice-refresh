@@ -206,7 +206,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 setStartDate("");
                 setEndDate("");
                 setSignBy("Александър Караманов");
-                setProtocolText(generateProtocolText("", ""));
+                setProtocolText(generateProtocolText("", "", ""));
                 setProducts([]);
                 onClearEdit();
                 toast.info("Клиентът е премахнат от формата");
