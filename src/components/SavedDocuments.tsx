@@ -135,7 +135,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
                         v{latest.version}
                       </span>
                       <span className="text-xs text-muted-foreground">
-                        {new Date(doc.updatedAt).toLocaleDateString("bg-BG")}
+                        {new Date(doc.updatedAt).toLocaleDateString("bg-BG")} {new Date(doc.updatedAt).toLocaleTimeString("bg-BG", { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>
                   </div>
