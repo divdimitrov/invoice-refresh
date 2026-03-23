@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Save, FileDown, Package, ClipboardList, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { exportPDF } from "@/lib/pdf-export";
 
 interface Product {
   id: string;
@@ -77,7 +78,15 @@ export function DocumentForm({ selectedClientName }: DocumentFormProps) {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="gap-1.5">
+          <Button variant="outline" size="sm" className="gap-1.5" onClick={() => {
+            exportPDF({
+              docType, docNumber,
+              assignor: assignor || selectedClientName || "",
+              executor, object, startDate, endDate,
+              signFor, signBy, protocolText, products,
+            });
+            toast.success("PDF файлът е генериран!");
+          }}>
             <FileDown className="h-4 w-4" />
             Експорт PDF
           </Button>
