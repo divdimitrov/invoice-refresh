@@ -104,7 +104,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
     setEndDate("");
     setSignFor(selectedClient?.contactPerson || "");
     setSignBy("Александър Караманов");
-    setProtocolText("Днес ...................... Подписаните, представители на Възложителя - ............................................. и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:");
+    setProtocolText(generateProtocolText("", selectedClient?.name || "", selectedClient?.contactPerson || ""));
     setProducts([]);
     onClearEdit();
   };
