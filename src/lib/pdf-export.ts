@@ -153,7 +153,7 @@ export function exportPDF(data: DocumentData) {
     doc.text("Оферта", pageWidth / 2, y, { align: "center" });
     y += 8;
     doc.setFontSize(11);
-    setColor(doc, C.dark);
+    setColor(doc, C.primary);
     doc.text(`Оферта № ${data.docNumber || ""}`, pageWidth / 2, y, { align: "center" });
     y += 10;
   }
