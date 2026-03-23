@@ -102,6 +102,7 @@
   }
 
   html {
+    font-size: 14px;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-tap-highlight-color: transparent;
     -webkit-font-smoothing: antialiased;
