@@ -405,16 +405,23 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Описание на обекта" value={object} onChange={(e) => setObject(e.target.value)} />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            {docType === "protocol" ? (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Начало</Label>
+                  <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Завършване</Label>
+                  <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+                </div>
+              </div>
+            ) : (
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Начало</Label>
+                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Дата на офертата</Label>
                 <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Завършване</Label>
-                <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-              </div>
-            </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
