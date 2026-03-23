@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,17 +6,19 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Trash2, Save, FileDown, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag } from "lucide-react";
+import { Plus, Trash2, Save, FileDown, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check } from "lucide-react";
 import { toast } from "sonner";
 import { exportPDF } from "@/lib/pdf-export";
 import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
 
 interface DocumentFormProps {
+  clients: Client[];
   selectedClient: Client | null;
   editingDocument: { doc: SavedDocument; versionIndex: number } | null;
   onClearEdit: () => void;
   onDocumentSaved: () => void;
   onAutoCreateClient: (clientData: Omit<Client, "id">) => Client;
+  onSelectClient: (id: string) => void;
 }
 
 export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient }: DocumentFormProps) {
