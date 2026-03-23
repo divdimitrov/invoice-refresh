@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { exportPDF } from "@/lib/pdf-export";
-import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
+import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument, updateClient } from "@/lib/storage";
 
 interface DocumentFormProps {
   clients: Client[];
