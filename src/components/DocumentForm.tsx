@@ -354,7 +354,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
                   {/* Total */}
                   <motion.div layout className="flex justify-between items-center pt-4 mt-2 border-t border-dashed px-1">
                     <p className="text-sm font-medium text-muted-foreground">Обща сума</p>
-                    <p className="text-2xl font-bold gradient-text">{total.toFixed(2)} лв.</p>
+                    <p className="text-2xl font-bold gradient-text">{total.toFixed(2)} €</p>
                   </motion.div>
                 </div>
               )}

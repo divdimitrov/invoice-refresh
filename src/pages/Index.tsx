@@ -106,6 +106,7 @@ const Index = () => {
           editingDocument={editingDocument}
           onClearEdit={() => setEditingDocument(null)}
           onDocumentSaved={refreshDocuments}
+          onAutoCreateClient={handleAutoCreateClient}
         />
 
         <AnimatePresence>
