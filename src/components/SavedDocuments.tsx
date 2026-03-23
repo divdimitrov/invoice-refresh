@@ -16,6 +16,20 @@ interface SavedDocumentsProps {
 
 export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }: SavedDocumentsProps) {
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  const filtered = useMemo(() => {
+    return documents.filter((doc) => {
+      const latest = doc.versions[doc.versions.length - 1];
+      const matchesSearch = !search || 
+        doc.title.toLowerCase().includes(search.toLowerCase()) ||
+        latest.docNumber.toLowerCase().includes(search.toLowerCase()) ||
+        latest.object.toLowerCase().includes(search.toLowerCase());
+      const matchesType = typeFilter === "all" || latest.docType === typeFilter;
+      return matchesSearch && matchesType;
+    });
+  }, [documents, search, typeFilter]);
 
   const handleDelete = (id: string) => {
     deleteDocument(id);
