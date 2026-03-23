@@ -1,7 +1,9 @@
 import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ClientSheet } from "@/components/ClientSheet";
 import { DocumentForm } from "@/components/DocumentForm";
 import { SavedDocuments } from "@/components/SavedDocuments";
+import { Sparkles, FileText } from "lucide-react";
 import {
   type Client, type SavedDocument,
   getClients, addClient as storageAddClient, deleteClient as storageDeleteClient, updateClient,
@@ -55,9 +57,10 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="sticky top-0 z-30 bg-card/95 backdrop-blur-md border-b">
-        <div className="flex items-center gap-2 px-3 h-12">
+    <div className="min-h-[100dvh]">
+      {/* Header */}
+      <header className="sticky top-0 z-30 glass border-b">
+        <div className="flex items-center gap-3 px-4 h-14 max-w-lg mx-auto">
           <ClientSheet
             clients={clients}
             selectedClient={selectedClientId}
@@ -66,17 +69,30 @@ const Index = () => {
             onDeleteClient={handleDeleteClient}
             onEditClient={handleEditClient}
           />
-          <div className="h-5 w-px bg-border" />
-          <h1 className="text-sm font-medium text-foreground">Фактуриране</h1>
-          {selectedClient && (
-            <span className="ml-auto text-xs text-muted-foreground truncate max-w-[120px]">
-              {selectedClient.name}
-            </span>
-          )}
+          <div className="flex items-center gap-2 flex-1">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg gradient-bg">
+              <FileText className="h-3.5 w-3.5 text-primary-foreground" />
+            </div>
+            <h1 className="text-sm font-semibold text-foreground tracking-tight">Фактуриране</h1>
+          </div>
+          <AnimatePresence>
+            {selectedClient && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-accent-foreground"
+              >
+                <Sparkles className="h-3 w-3" />
+                <span className="text-xs font-medium truncate max-w-[100px]">{selectedClient.name}</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </header>
 
-      <main className="px-3 py-4 max-w-lg mx-auto space-y-4">
+      {/* Content */}
+      <main className="px-4 py-5 max-w-lg mx-auto space-y-5">
         <DocumentForm
           selectedClient={selectedClient}
           editingDocument={editingDocument}
@@ -84,15 +100,23 @@ const Index = () => {
           onDocumentSaved={refreshDocuments}
         />
 
-        {selectedClientId && (
-          <div className="pb-20">
-            <SavedDocuments
-              documents={clientDocuments}
-              onDocumentsChange={refreshDocuments}
-              onEditDocument={handleEditDocument}
-            />
-          </div>
-        )}
+        <AnimatePresence>
+          {selectedClientId && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+              className="pb-24"
+            >
+              <SavedDocuments
+                documents={clientDocuments}
+                onDocumentsChange={refreshDocuments}
+                onEditDocument={handleEditDocument}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );
