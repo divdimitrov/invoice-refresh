@@ -425,7 +425,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Цена</Label>
-                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={0} step={0.01} value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })} />
+                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={0} step={0.01} placeholder="0.00" value={newProduct.price} onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })} />
                 </div>
               </div>
               <Button onClick={addProduct} className="w-full h-12 gap-2 rounded-xl gradient-bg hover:opacity-90 transition-opacity text-sm font-semibold">
