@@ -19,6 +19,7 @@ interface DocumentFormProps {
   onDocumentSaved: () => void;
   onAutoCreateClient: (clientData: Omit<Client, "id">) => Client;
   onSelectClient: (id: string) => void;
+  onEditClient: (client: Client) => void;
 }
 
 export function DocumentForm({ clients, selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient, onSelectClient }: DocumentFormProps) {
