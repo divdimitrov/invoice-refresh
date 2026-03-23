@@ -28,9 +28,14 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
   const [endDate, setEndDate] = useState("");
   const [signFor, setSignFor] = useState("");
   const [signBy, setSignBy] = useState("Александър Караманов");
-  const [protocolText, setProtocolText] = useState(
-    "Днес ...................... Подписаните, представители на Възложителя - ............................................. и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:"
-  );
+  const generateProtocolText = (date: string, assignorName: string, signForName: string) => {
+    const dateStr = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
+    const assignorStr = assignorName || ".............................................";
+    const signForStr = signForName || ".............................................";
+    return `Днес ${dateStr} Подписаните, ${signForStr} - представител на Възложителя - ${assignorStr} и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:`;
+  };
+
+  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: 1, unit: "бр.", price: 0 });
 
