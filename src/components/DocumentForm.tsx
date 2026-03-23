@@ -42,7 +42,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
 
   const [protocolText, setProtocolText] = useState(() => generateProtocolText("", ""));
   const [products, setProducts] = useState<Product[]>([]);
-  const [newProduct, setNewProduct] = useState({ name: "", quantity: 1, unit: "бр.", price: 0 });
+  const [newProduct, setNewProduct] = useState({ name: "", quantity: "" as string | number, unit: "", price: "" as string | number });
 
   useEffect(() => {
     if (selectedClient && !editingDocument) {
