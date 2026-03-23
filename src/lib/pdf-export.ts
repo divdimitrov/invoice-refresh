@@ -26,17 +26,15 @@ interface DocumentData {
   products: Product[];
 }
 
-// Modern color palette
+// Color palette
 const C = {
-  primary: [22, 78, 99] as const,       // deep teal
-  primaryLight: [207, 236, 244] as const, // light teal bg
-  accent: [245, 158, 11] as const,        // amber
-  accentBg: [255, 251, 235] as const,     // warm cream
-  dark: [15, 23, 42] as const,            // slate-900
-  mid: [71, 85, 105] as const,            // slate-500
-  light: [148, 163, 184] as const,        // slate-400
-  line: [226, 232, 240] as const,         // slate-200
-  bgAlt: [248, 250, 252] as const,        // slate-50
+  primary: [22, 78, 99] as const,
+  accent: [180, 45, 45] as const,
+  dark: [30, 30, 30] as const,
+  mid: [100, 100, 100] as const,
+  light: [170, 170, 170] as const,
+  line: [210, 210, 210] as const,
+  bgAlt: [247, 248, 250] as const,
   white: [255, 255, 255] as const,
 };
 
@@ -48,7 +46,7 @@ function setupFonts(doc: jsPDF) {
   doc.setFont("Roboto", "normal");
 }
 
-function setColor(doc: jsPDF, c: readonly [number, number, number]) {
+function color(doc: jsPDF, c: readonly [number, number, number]) {
   doc.setTextColor(c[0], c[1], c[2]);
 }
 
@@ -56,123 +54,114 @@ export function exportPDF(data: DocumentData) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   setupFonts(doc);
 
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageHeight = doc.internal.pageSize.getHeight();
-  const margin = 18;
-  const contentWidth = pageWidth - margin * 2;
+  const pw = doc.internal.pageSize.getWidth(); // 210
+  const ph = doc.internal.pageSize.getHeight(); // 297
+  const m = 20; // margin
+  const cw = pw - m * 2; // content width
+  let y = 18;
 
-  // === Top accent bar ===
-  doc.setFillColor(C.primary[0], C.primary[1], C.primary[2]);
-  doc.rect(0, 0, pageWidth, 3, "F");
+  // ── Top line accent ──
+  doc.setFillColor(C.accent[0], C.accent[1], C.accent[2]);
+  doc.rect(0, 0, pw, 2.5, "F");
 
-  let y = 16;
-
-  // === Logo ===
+  // ── Logo ──
   try {
-    doc.addImage(logoBase64, "PNG", margin, y - 6, 55, 18);
+    // Logo is 3:2, render at ~40x26mm — large and clear
+    doc.addImage(logoBase64, "PNG", m, y, 40, 26);
   } catch {
     // skip
   }
 
-  // === Right-aligned date ===
+  // ── Date (top right) ──
   if (data.startDate) {
     doc.setFont("Roboto", "normal");
-    doc.setFontSize(8.5);
-    setColor(doc, C.mid);
+    doc.setFontSize(9);
+    color(doc, C.mid);
     const dateStr = new Date(data.startDate).toLocaleDateString("bg-BG");
-    doc.text(dateStr, pageWidth - margin, y + 2, { align: "right" });
+    doc.text(dateStr, pw - m, y + 5, { align: "right" });
   }
 
-  y += 18;
+  y += 32;
 
-  // === Thin separator ===
+  // ── Separator ──
   doc.setDrawColor(C.line[0], C.line[1], C.line[2]);
-  doc.setLineWidth(0.4);
-  doc.line(margin, y, pageWidth - margin, y);
-  y += 8;
+  doc.setLineWidth(0.3);
+  doc.line(m, y, pw - m, y);
+  y += 6;
 
-  // === Parties info block ===
-  const infoBoxY = y;
-  doc.setFillColor(C.bgAlt[0], C.bgAlt[1], C.bgAlt[2]);
-  doc.roundedRect(margin, infoBoxY - 3, contentWidth, 22, 2, 2, "F");
+  // ── Parties info ──
+  const col1X = m;
+  const col2X = pw / 2 + 5;
 
-  doc.setFontSize(8);
-
-  // Left column
-  doc.setFont("Roboto", "bold");
-  setColor(doc, C.mid);
-  doc.text("ВЪЗЛОЖИТЕЛ", margin + 5, y + 1);
-  doc.setFont("Roboto", "normal");
-  setColor(doc, C.dark);
-  doc.setFontSize(9.5);
-  doc.text(data.assignor || "—", margin + 5, y + 6);
-
-  // Right column
-  doc.setFontSize(8);
-  doc.setFont("Roboto", "bold");
-  setColor(doc, C.mid);
-  doc.text("ИЗПЪЛНИТЕЛ", pageWidth / 2 + 5, y + 1);
-  doc.setFont("Roboto", "normal");
-  setColor(doc, C.dark);
-  doc.setFontSize(9.5);
-  doc.text(data.executor || "—", pageWidth / 2 + 5, y + 6);
-
-  // Object row
-  if (data.object) {
-    doc.setFontSize(8);
+  const drawInfoPair = (label: string, value: string, x: number, yPos: number) => {
     doc.setFont("Roboto", "bold");
-    setColor(doc, C.mid);
-    doc.text("ОБЕКТ", margin + 5, y + 13);
+    doc.setFontSize(8);
+    color(doc, C.accent);
+    doc.text(label, x, yPos);
     doc.setFont("Roboto", "normal");
-    setColor(doc, C.dark);
-    doc.setFontSize(9.5);
-    doc.text(data.object, margin + 22, y + 13);
+    doc.setFontSize(10);
+    color(doc, C.dark);
+    doc.text(value || "—", x, yPos + 5);
+  };
+
+  drawInfoPair("Възложител:", data.assignor, col1X, y);
+  drawInfoPair("Изпълнител:", data.executor, col2X, y);
+  y += 13;
+
+  if (data.object) {
+    drawInfoPair("Обект:", data.object, col1X, y);
+    y += 13;
   }
 
-  y = infoBoxY + 22 + 8;
+  y += 4;
 
-  // === Title ===
-  setColor(doc, C.primary);
+  // ── Separator ──
+  doc.setDrawColor(C.line[0], C.line[1], C.line[2]);
+  doc.line(m, y, pw - m, y);
+  y += 10;
+
+  // ── Title ──
+  color(doc, C.primary);
   doc.setFont("Roboto", "bold");
 
   if (data.docType === "protocol") {
     doc.setFontSize(14);
-    doc.text("Приемо-предавателен протокол Акт обр.19", pageWidth / 2, y, { align: "center" });
-    y += 7;
-    doc.setFontSize(11);
-    setColor(doc, C.primary);
-    doc.text(`Протокол № ${data.docNumber || ""}`, pageWidth / 2, y, { align: "center" });
+    doc.text("Приемо-предавателен протокол Акт обр.19", pw / 2, y, { align: "center" });
+    y += 8;
+    doc.setFontSize(12);
+    doc.text(`Протокол № ${data.docNumber || ""}`, pw / 2, y, { align: "center" });
     y += 6;
-    doc.setFontSize(8.5);
+    doc.setFontSize(9);
     doc.setFont("Roboto", "normal");
-    setColor(doc, C.mid);
-    doc.text("за установяване завършването и за изплащането на натурални видове СМР", pageWidth / 2, y, { align: "center" });
-    y += 9;
+    color(doc, C.mid);
+    doc.text("за установяване завършването и за изплащането на натурални видове СМР", pw / 2, y, { align: "center" });
+    y += 10;
   } else {
     doc.setFontSize(16);
-    doc.text("Оферта", pageWidth / 2, y, { align: "center" });
-    y += 8;
-    doc.setFontSize(11);
-    setColor(doc, C.primary);
-    doc.text(`Оферта № ${data.docNumber || ""}`, pageWidth / 2, y, { align: "center" });
-    y += 10;
+    doc.text("Оферта", pw / 2, y, { align: "center" });
+    y += 9;
+    doc.setFontSize(12);
+    doc.text(`Оферта № ${data.docNumber || ""}`, pw / 2, y, { align: "center" });
+    y += 12;
   }
 
-  // === Protocol text ===
+  // ── Protocol text ──
   if (data.protocolText && data.docType === "protocol") {
     doc.setFont("Roboto", "normal");
-    doc.setFontSize(8.5);
-    setColor(doc, C.mid);
-    const lines = doc.splitTextToSize(data.protocolText, contentWidth - 4);
-    // Subtle left border accent
-    doc.setDrawColor(C.primary[0], C.primary[1], C.primary[2]);
+    doc.setFontSize(9);
+    color(doc, C.mid);
+
+    // Left accent bar
+    const lines = doc.splitTextToSize(data.protocolText, cw - 6);
+    doc.setDrawColor(C.accent[0], C.accent[1], C.accent[2]);
     doc.setLineWidth(0.8);
-    doc.line(margin, y - 2, margin, y + lines.length * 4 + 1);
-    doc.text(lines, margin + 4, y);
-    y += lines.length * 4 + 8;
+    doc.line(m, y - 1, m, y + lines.length * 4.2 + 1);
+
+    doc.text(lines, m + 4, y);
+    y += lines.length * 4.2 + 8;
   }
 
-  // === Products table ===
+  // ── Products table ──
   if (data.products.length > 0) {
     const total = data.products.reduce((s, p) => s + p.quantity * p.price, 0);
     const vat = total * 0.2;
@@ -180,7 +169,7 @@ export function exportPDF(data: DocumentData) {
 
     autoTable(doc, {
       startY: y,
-      margin: { left: margin, right: margin },
+      margin: { left: m, right: m },
       head: [["№", "Видове работа", "Ед.мярка", "К-во", "Ед.цена", "Цена"]],
       body: data.products.map((p, i) => [
         String(i + 1),
@@ -218,78 +207,80 @@ export function exportPDF(data: DocumentData) {
         5: { cellWidth: 25, halign: "right" },
       },
       didDrawPage: () => {
-        // Redraw top bar on new pages
-        doc.setFillColor(C.primary[0], C.primary[1], C.primary[2]);
-        doc.rect(0, 0, pageWidth, 3, "F");
+        doc.setFillColor(C.accent[0], C.accent[1], C.accent[2]);
+        doc.rect(0, 0, pw, 2.5, "F");
       },
     });
 
-    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 4;
+    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 5;
 
-    // === Totals block ===
-    const totalsWidth = 75;
-    const totalsX = pageWidth - margin - totalsWidth;
+    // ── Totals ──
+    const boxW = 80;
+    const boxX = pw - m - boxW;
 
-    const drawTotalRow = (label: string, value: string, isGrand = false) => {
-      if (isGrand) {
+    const drawRow = (label: string, value: string, highlight = false) => {
+      if (highlight) {
         doc.setFillColor(C.primary[0], C.primary[1], C.primary[2]);
-        doc.roundedRect(totalsX, y - 4.5, totalsWidth, 8, 1, 1, "F");
+        doc.roundedRect(boxX, y - 4.5, boxW, 8, 1.5, 1.5, "F");
         doc.setFont("Roboto", "bold");
-        doc.setFontSize(9.5);
-        setColor(doc, C.white);
-        doc.text(label, totalsX + 4, y);
-        doc.text(value, totalsX + totalsWidth - 4, y, { align: "right" });
+        doc.setFontSize(10);
+        color(doc, C.white);
       } else {
         doc.setFont("Roboto", "normal");
         doc.setFontSize(9);
-        setColor(doc, C.mid);
-        doc.text(label, totalsX + 4, y);
-        doc.setFont("Roboto", "bold");
-        setColor(doc, C.dark);
-        doc.text(value, totalsX + totalsWidth - 4, y, { align: "right" });
+        color(doc, C.mid);
       }
-      y += isGrand ? 8 : 6;
+      doc.text(label, boxX + 5, y);
+
+      if (highlight) {
+        doc.setFont("Roboto", "bold");
+        color(doc, C.white);
+      } else {
+        doc.setFont("Roboto", "bold");
+        color(doc, C.dark);
+      }
+      doc.text(value, boxX + boxW - 5, y, { align: "right" });
+      y += highlight ? 10 : 6;
     };
 
-    drawTotalRow("Общо СМР:", total.toFixed(2) + " €");
-    drawTotalRow("ДДС (20%):", vat.toFixed(2) + " €");
+    drawRow("Общо СМР:", total.toFixed(2) + " €");
+    drawRow("ДДС (20%):", vat.toFixed(2) + " €");
     y += 1;
-    drawTotalRow("Всичко:", grandTotal.toFixed(2) + " €", true);
+    drawRow("Всичко:", grandTotal.toFixed(2) + " €", true);
   }
 
-  // === Signatures ===
+  // ── Signatures ──
   const sigY = Math.max(y + 30, 230);
-  const needNewPage = sigY > pageHeight - 45;
+  const needNewPage = sigY > ph - 50;
   if (needNewPage) doc.addPage();
-  const finalSigY = needNewPage ? 50 : sigY;
+  const fSigY = needNewPage ? 50 : sigY;
 
-  const leftCenter = margin + contentWidth * 0.25;
-  const rightCenter = margin + contentWidth * 0.75;
+  const leftCx = m + cw * 0.25;
+  const rightCx = m + cw * 0.75;
 
-  const drawSignature = (cx: number, title: string, name: string) => {
+  const drawSig = (cx: number, title: string, name: string) => {
     doc.setFont("Roboto", "bold");
     doc.setFontSize(9);
-    setColor(doc, C.mid);
-    doc.text(title, cx, finalSigY, { align: "center" });
+    color(doc, C.dark);
+    doc.text(title, cx, fSigY, { align: "center" });
 
-    // Signature line
-    doc.setDrawColor(C.light[0], C.light[1], C.light[2]);
-    doc.setLineWidth(0.5);
-    doc.line(cx - 38, finalSigY + 16, cx + 38, finalSigY + 16);
+    doc.setDrawColor(C.line[0], C.line[1], C.line[2]);
+    doc.setLineWidth(0.4);
+    doc.line(cx - 38, fSigY + 18, cx + 38, fSigY + 18);
 
     doc.setFont("Roboto", "normal");
     doc.setFontSize(9);
-    setColor(doc, C.primary);
+    color(doc, C.primary);
     const text = name ? `/ ${name} /` : "/ ......................... /";
-    doc.text(text, cx, finalSigY + 22, { align: "center" });
+    doc.text(text, cx, fSigY + 24, { align: "center" });
   };
 
-  drawSignature(leftCenter, "За Възложителя:", data.signFor);
-  drawSignature(rightCenter, "За Изпълнителя:", data.signBy);
+  drawSig(leftCx, "За Възложителя:", data.signFor);
+  drawSig(rightCx, "За Изпълнителя:", data.signBy);
 
-  // === Bottom accent bar ===
-  doc.setFillColor(C.primary[0], C.primary[1], C.primary[2]);
-  doc.rect(0, pageHeight - 3, pageWidth, 3, "F");
+  // ── Bottom accent ──
+  doc.setFillColor(C.accent[0], C.accent[1], C.accent[2]);
+  doc.rect(0, ph - 2.5, pw, 2.5, "F");
 
   // Save
   const fileName = `${data.docType === "protocol" ? "Протокол" : "Оферта"}${data.docNumber ? `_${data.docNumber}` : ""}.pdf`;
