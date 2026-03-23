@@ -16,9 +16,10 @@ interface DocumentFormProps {
   editingDocument: { doc: SavedDocument; versionIndex: number } | null;
   onClearEdit: () => void;
   onDocumentSaved: () => void;
+  onAutoCreateClient: (clientData: Omit<Client, "id">) => Client;
 }
 
-export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onDocumentSaved }: DocumentFormProps) {
+export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient }: DocumentFormProps) {
   const [docType, setDocType] = useState("protocol");
   const [docNumber, setDocNumber] = useState("");
   const [assignor, setAssignor] = useState("");
@@ -28,14 +29,13 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
   const [endDate, setEndDate] = useState("");
   const [signFor, setSignFor] = useState("");
   const [signBy, setSignBy] = useState("Александър Караманов");
-  const generateProtocolText = (date: string, assignorName: string, signForName: string) => {
+  const generateProtocolText = (date: string, signForName: string) => {
     const dateStr = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
-    const assignorStr = assignorName || ".............................................";
     const signForStr = signForName || ".............................................";
-    return `Днес ${dateStr} Подписаните, ${signForStr} - представител на Възложителя - ${assignorStr} и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:`;
+    return `Днес ${dateStr} Подписаните, ${signForStr} - представител на Възложителя и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:`;
   };
 
-  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
+  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: 1, unit: "бр.", price: 0 });
 
@@ -49,9 +49,9 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
   // Auto-update protocol text when relevant fields change (only for new docs)
   useEffect(() => {
     if (!editingDocument && docType === "protocol") {
-      setProtocolText(generateProtocolText(startDate, assignor, signFor));
+      setProtocolText(generateProtocolText(startDate, signFor));
     }
-  }, [startDate, assignor, signFor, docType, editingDocument]);
+  }, [startDate, signFor, docType, editingDocument]);
 
   useEffect(() => {
     if (editingDocument) {
@@ -104,14 +104,25 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
     setEndDate("");
     setSignFor(selectedClient?.contactPerson || "");
     setSignBy("Александър Караманов");
-    setProtocolText(generateProtocolText("", selectedClient?.name || "", selectedClient?.contactPerson || ""));
+    setProtocolText(generateProtocolText("", selectedClient?.contactPerson || ""));
     setProducts([]);
     onClearEdit();
   };
 
   const handleSave = () => {
-    if (!selectedClient) {
-      toast.error("Моля, изберете клиент");
+    let currentClient = selectedClient;
+    
+    // Auto-create client if no client selected but assignor is filled
+    if (!currentClient && assignor.trim()) {
+      currentClient = onAutoCreateClient({
+        name: assignor.trim(),
+        contactPerson: signFor.trim() || undefined,
+      });
+      toast.success(`Клиентът "${assignor.trim()}" е създаден автоматично`);
+    }
+    
+    if (!currentClient) {
+      toast.error("Моля, изберете клиент или въведете Възложител");
       return;
     }
     const versionData = getVersionData();
@@ -123,7 +134,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
       const now = new Date().toISOString();
       saveDocument({
         id: crypto.randomUUID(),
-        clientId: selectedClient.id,
+        clientId: currentClient.id,
         title: `${docType === "protocol" ? "Протокол" : "Оферта"}${docNumber ? ` ${docNumber}` : ""}`,
         versions: [{ ...versionData, version: 1, savedAt: now }],
         createdAt: now,
@@ -328,11 +339,11 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{p.name}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{p.quantity} {p.unit} × {p.price.toFixed(2)} лв.</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{p.quantity} {p.unit} × {p.price.toFixed(2)} €</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="font-bold text-sm">{(p.quantity * p.price).toFixed(2)}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium">лв.</p>
+                        <p className="text-[10px] text-muted-foreground font-medium">€</p>
                       </div>
                       <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-xl opacity-50 group-hover:opacity-100 transition-opacity" onClick={() => removeProduct(p.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -343,7 +354,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
                   {/* Total */}
                   <motion.div layout className="flex justify-between items-center pt-4 mt-2 border-t border-dashed px-1">
                     <p className="text-sm font-medium text-muted-foreground">Обща сума</p>
-                    <p className="text-2xl font-bold gradient-text">{total.toFixed(2)} лв.</p>
+                    <p className="text-2xl font-bold gradient-text">{total.toFixed(2)} €</p>
                   </motion.div>
                 </div>
               )}
