@@ -140,7 +140,7 @@ export function exportPDF(data: DocumentData) {
     doc.text("Приемо-предавателен протокол Акт обр.19", pageWidth / 2, y, { align: "center" });
     y += 7;
     doc.setFontSize(11);
-    setColor(doc, C.dark);
+    setColor(doc, C.primary);
     doc.text(`Протокол № ${data.docNumber || ""}`, pageWidth / 2, y, { align: "center" });
     y += 6;
     doc.setFontSize(8.5);
