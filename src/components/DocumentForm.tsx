@@ -21,7 +21,7 @@ interface DocumentFormProps {
   onSelectClient: (id: string) => void;
 }
 
-export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient }: DocumentFormProps) {
+export function DocumentForm({ clients, selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient, onSelectClient }: DocumentFormProps) {
   const [docType, setDocType] = useState("protocol");
   const [docNumber, setDocNumber] = useState("");
   const [assignor, setAssignor] = useState("");
@@ -31,6 +31,9 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
   const [endDate, setEndDate] = useState("");
   const [signFor, setSignFor] = useState("");
   const [signBy, setSignBy] = useState("Александър Караманов");
+  const [clientSearch, setClientSearch] = useState("");
+  const [showClientDropdown, setShowClientDropdown] = useState(false);
+  const clientSearchRef = useRef<HTMLDivElement>(null);
   const generateProtocolText = (date: string, signForName: string) => {
     const dateStr = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
     const signForStr = signForName || ".............................................";
