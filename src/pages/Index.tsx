@@ -30,10 +30,18 @@ const Index = () => {
     setEditingDocument(null);
   };
 
-  const handleAddClient = (clientData: Omit<Client, "id">) => {
+  const handleAddClient = (clientData: Omit<Client, "id">): Client => {
     const client: Client = { ...clientData, id: crypto.randomUUID() };
     const updated = storageAddClient(client);
     setClients(updated);
+    return client;
+  };
+
+  const handleAutoCreateClient = (clientData: Omit<Client, "id">): Client => {
+    const client = handleAddClient(clientData);
+    setSelectedClientId(client.id);
+    setClientDocuments(getClientDocuments(client.id));
+    return client;
   };
 
   const handleDeleteClient = (id: string) => {
