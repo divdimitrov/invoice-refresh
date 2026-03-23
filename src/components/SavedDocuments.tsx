@@ -181,11 +181,11 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
                             <span className="text-muted-foreground flex-1">
                               {new Date(v.savedAt).toLocaleString("bg-BG")}
                             </span>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg" onClick={() => handleExportVersion(doc, idx)}>
-                              <FileDown className="h-3 w-3" />
+                            <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] font-medium" onClick={() => handleExportVersion(doc, idx)}>
+                              PDF
                             </Button>
-                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg" onClick={() => onEditDocument(doc, idx)}>
-                              <Edit className="h-3 w-3" />
+                            <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] font-medium" onClick={() => onEditDocument(doc, idx)}>
+                              Промени
                             </Button>
                           </div>
                         ))}
