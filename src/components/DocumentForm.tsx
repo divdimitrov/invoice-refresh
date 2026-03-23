@@ -34,7 +34,9 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [signBy, setSignBy] = useState("Александър Караманов");
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
+  const [showRepDropdown, setShowRepDropdown] = useState(false);
   const clientSearchRef = useRef<HTMLDivElement>(null);
+  const repRef = useRef<HTMLDivElement>(null);
   const generateProtocolText = (date: string, signForName: string, endDateStr: string) => {
     const dateFormatted = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
     const endDateFormatted = endDateStr ? new Date(endDateStr).toLocaleDateString("bg-BG") : "......................";
