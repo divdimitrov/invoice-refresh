@@ -480,16 +480,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 <ShoppingBag className="h-4 w-4 text-accent-foreground" />
               </div>
               <h2 className="text-[15px] font-semibold text-foreground">Продукти</h2>
+              {products.length > 0 && (
+                <span className="text-xs text-muted-foreground font-medium">({products.length})</span>
+              )}
             </div>
-            {products.length > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full gradient-bg text-primary-foreground text-xs font-bold"
-              >
-                {products.length}
-              </motion.span>
-            )}
           </div>
           <CardContent className="space-y-4 px-5 pb-5">
             {/* Add product form */}
