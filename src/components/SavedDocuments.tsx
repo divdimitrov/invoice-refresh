@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Edit, Trash2, FileDown, Clock, ChevronDown, ChevronUp, Search, Filter, Archive } from "lucide-react";
+import { FileText, Trash2, Clock, ChevronDown, Search, Filter, Archive } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { exportPDF } from "@/lib/pdf-export";
 import { toast } from "sonner";
