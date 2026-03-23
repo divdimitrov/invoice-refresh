@@ -125,6 +125,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   });
 
   const handleExport = () => {
+    if (!docNumber.trim()) {
+      toast.error("Моля, въведете номер на документа");
+      return;
+    }
     exportPDF(getVersionData());
     toast.success("PDF файлът е генериран!");
   };
@@ -146,6 +150,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   };
 
   const handleSave = () => {
+    if (!docNumber.trim()) {
+      toast.error("Моля, въведете номер на документа");
+      return;
+    }
     let currentClient = selectedClient;
     
     // Auto-create client if no client selected but assignor is filled
@@ -290,7 +298,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">Номер</Label>
+                <Label className="text-xs font-medium text-muted-foreground">Номер <span className="text-destructive">*</span></Label>
                 <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Напр. 1.2.3.4" value={docNumber} onChange={(e) => setDocNumber(e.target.value)} />
               </div>
             </div>
