@@ -62,6 +62,9 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       if (clientSearchRef.current && !clientSearchRef.current.contains(e.target as Node)) {
         setShowClientDropdown(false);
       }
+      if (repRef.current && !repRef.current.contains(e.target as Node)) {
+        setShowRepDropdown(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
