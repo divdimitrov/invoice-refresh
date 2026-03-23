@@ -35,7 +35,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
     return `Днес ${dateStr} Подписаните, ${signForStr} - представител на Възложителя и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:`;
   };
 
-  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
+  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: 1, unit: "бр.", price: 0 });
 
