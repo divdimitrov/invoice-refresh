@@ -430,7 +430,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
             {docType === "protocol" && (
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">Текст на протокола</Label>
-                <Textarea rows={4} value={protocolText} onChange={(e) => setProtocolText(e.target.value)} className="resize-none text-sm rounded-xl bg-muted/40 border-transparent focus:border-primary/30" />
+                <Textarea rows={8} value={protocolText} onChange={(e) => setProtocolText(e.target.value)} className="resize-y text-sm rounded-xl bg-muted/40 border-transparent focus:border-primary/30 min-h-[120px]" />
               </div>
             )}
           </CardContent>
