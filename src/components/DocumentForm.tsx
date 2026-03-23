@@ -238,10 +238,12 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label className="text-xs font-medium text-muted-foreground">Текст на протокола</Label>
-              <Textarea rows={3} value={protocolText} onChange={(e) => setProtocolText(e.target.value)} className="resize-none text-sm rounded-xl bg-muted/40 border-transparent focus:border-primary/30" />
-            </div>
+            {docType === "protocol" && (
+              <div className="space-y-1.5">
+                <Label className="text-xs font-medium text-muted-foreground">Текст на протокола</Label>
+                <Textarea rows={4} value={protocolText} onChange={(e) => setProtocolText(e.target.value)} className="resize-none text-sm rounded-xl bg-muted/40 border-transparent focus:border-primary/30" />
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>
