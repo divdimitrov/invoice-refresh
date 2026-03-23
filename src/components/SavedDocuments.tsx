@@ -71,10 +71,8 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
             <Archive className="h-4 w-4 text-muted-foreground" />
           </div>
           <h2 className="text-[15px] font-semibold text-foreground">Документи</h2>
+          <span className="text-xs text-muted-foreground font-medium">({documents.length})</span>
         </div>
-        <span className="inline-flex items-center justify-center h-6 min-w-[24px] px-2 rounded-full bg-muted text-muted-foreground text-xs font-bold">
-          {documents.length}
-        </span>
       </div>
       <CardContent className="px-5 pb-5 space-y-3">
         {/* Search & Filter */}
