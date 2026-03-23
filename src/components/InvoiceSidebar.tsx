@@ -72,7 +72,7 @@ export function InvoiceSidebar({
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup defaultOpen>
+        <SidebarGroup>
           <SidebarGroupLabel className="text-sidebar-foreground/50 text-xs uppercase tracking-wider">
             {!collapsed && <><Users className="mr-2 h-3.5 w-3.5" />Клиенти</>}
             {collapsed && <Users className="h-3.5 w-3.5" />}
