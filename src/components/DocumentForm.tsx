@@ -34,13 +34,14 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [clientSearch, setClientSearch] = useState("");
   const [showClientDropdown, setShowClientDropdown] = useState(false);
   const clientSearchRef = useRef<HTMLDivElement>(null);
-  const generateProtocolText = (date: string, signForName: string) => {
-    const dateStr = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
+  const generateProtocolText = (date: string, signForName: string, endDateStr: string) => {
+    const dateFormatted = date ? new Date(date).toLocaleDateString("bg-BG") : "......................";
+    const endDateFormatted = endDateStr ? new Date(endDateStr).toLocaleDateString("bg-BG") : "......................";
     const signForStr = signForName || ".............................................";
-    return `Днес ${dateStr} Подписаните, ${signForStr} - представител на Възложителя и Александър Караманов - представител на Изпълнителя, съставиха настоящия протокол за следното:`;
+    return `Днес ${dateFormatted} Подписаните, представители на Възложителя - ${signForStr} и Александър Караманов - представител на Изпълнителя, след проверка на място установихме, че към ${endDateFormatted} са извършени и подлежат на заплащане въз основа на този протокол, следните натурални видове строително и монтажни работи`;
   };
 
-  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", ""));
+  const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: "" as string | number, unit: "", price: "" as string | number });
 
@@ -66,9 +67,9 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   // Auto-update protocol text when relevant fields change (only for new docs)
   useEffect(() => {
     if (!editingDocument && docType === "protocol") {
-      setProtocolText(generateProtocolText(startDate, signFor));
+      setProtocolText(generateProtocolText(startDate, signFor, endDate));
     }
-  }, [startDate, signFor, docType, editingDocument]);
+  }, [startDate, endDate, signFor, docType, editingDocument]);
 
   useEffect(() => {
     if (editingDocument) {
@@ -124,7 +125,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setEndDate("");
     setSignFor(selectedClient?.contactPerson || "");
     setSignBy("Александър Караманов");
-    setProtocolText(generateProtocolText("", selectedClient?.contactPerson || ""));
+    setProtocolText(generateProtocolText("", selectedClient?.contactPerson || "", ""));
     setProducts([]);
     onClearEdit();
   };
@@ -205,7 +206,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 setStartDate("");
                 setEndDate("");
                 setSignBy("Александър Караманов");
-                setProtocolText(generateProtocolText("", ""));
+                setProtocolText(generateProtocolText("", "", ""));
                 setProducts([]);
                 onClearEdit();
                 toast.info("Клиентът е премахнат от формата");
