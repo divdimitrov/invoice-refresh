@@ -142,21 +142,21 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-0.5 shrink-0">
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={() => handleExportVersion(doc, doc.versions.length - 1)}>
-                      <FileDown className="h-4 w-4" />
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-medium gap-1" onClick={() => handleExportVersion(doc, doc.versions.length - 1)}>
+                      PDF
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={() => onEditDocument(doc, doc.versions.length - 1)}>
-                      <Edit className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-medium gap-1" onClick={() => onEditDocument(doc, doc.versions.length - 1)}>
+                      Промени
                     </Button>
                     {doc.versions.length > 1 && (
-                      <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl" onClick={() => setExpandedDoc(isExpanded ? null : doc.id)}>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setExpandedDoc(isExpanded ? null : doc.id)}>
                         <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
                           <ChevronDown className="h-4 w-4" />
                         </motion.div>
                       </Button>
                     )}
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl opacity-50 hover:opacity-100" onClick={() => handleDelete(doc.id)}>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg opacity-50 hover:opacity-100" onClick={() => handleDelete(doc.id)}>
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
