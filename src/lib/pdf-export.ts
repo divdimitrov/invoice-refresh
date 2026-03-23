@@ -69,7 +69,7 @@ export function exportPDF(data: DocumentData) {
 
   // === Logo ===
   try {
-    doc.addImage(logoBase64, "PNG", margin, y - 6, 45, 22);
+    doc.addImage(logoBase64, "PNG", margin, y - 6, 55, 18);
   } catch {
     // skip
   }
