@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Save, FileDown, Package, ClipboardList, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { exportPDF } from "@/lib/pdf-export";
 
 interface Product {
   id: string;
