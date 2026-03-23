@@ -19,7 +19,7 @@ interface DocumentFormProps {
   onAutoCreateClient: (clientData: Omit<Client, "id">) => Client;
 }
 
-export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onDocumentSaved }: DocumentFormProps) {
+export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onDocumentSaved, onAutoCreateClient }: DocumentFormProps) {
   const [docType, setDocType] = useState("protocol");
   const [docNumber, setDocNumber] = useState("");
   const [assignor, setAssignor] = useState("");
