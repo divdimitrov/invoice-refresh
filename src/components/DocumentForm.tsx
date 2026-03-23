@@ -339,7 +339,7 @@ export function DocumentForm({ selectedClient, editingDocument, onClearEdit, onD
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{p.name}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{p.quantity} {p.unit} × {p.price.toFixed(2)} лв.</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{p.quantity} {p.unit} × {p.price.toFixed(2)} €</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="font-bold text-sm">{(p.quantity * p.price).toFixed(2)}</p>
