@@ -463,9 +463,40 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 relative" ref={repRef}>
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" />За Възложителя</Label>
-                <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Име" value={signFor} onChange={(e) => setSignFor(e.target.value)} />
+                <Input
+                  className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30"
+                  placeholder="Име"
+                  value={signFor}
+                  onChange={(e) => { setSignFor(e.target.value); setShowRepDropdown(true); }}
+                  onFocus={() => setShowRepDropdown(true)}
+                />
+                <AnimatePresence>
+                  {showRepDropdown && selectedClient?.representatives && selectedClient.representatives.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute z-20 left-0 right-0 mt-1 rounded-xl border bg-popover shadow-lg overflow-hidden"
+                    >
+                      <div className="max-h-36 overflow-y-auto">
+                        {selectedClient.representatives
+                          .filter(r => !signFor.trim() || r.toLowerCase().includes(signFor.toLowerCase()))
+                          .map((rep, idx) => (
+                            <button
+                              key={idx}
+                              className={`w-full px-4 py-2.5 text-left text-sm hover:bg-accent/60 transition-colors ${signFor === rep ? 'bg-accent font-medium' : ''}`}
+                              onClick={() => { setSignFor(rep); setShowRepDropdown(false); }}
+                            >
+                              {rep}
+                            </button>
+                          ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Users className="h-3 w-3" />За Изпълнителя</Label>
