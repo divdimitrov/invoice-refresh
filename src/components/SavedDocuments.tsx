@@ -1,10 +1,12 @@
 import { SavedDocument, deleteDocument } from "@/lib/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Edit, Trash2, FileDown, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { FileText, Edit, Trash2, FileDown, Clock, ChevronDown, ChevronUp, Search, Filter } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { exportPDF } from "@/lib/pdf-export";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface SavedDocumentsProps {
   documents: SavedDocument[];
@@ -14,6 +16,20 @@ interface SavedDocumentsProps {
 
 export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }: SavedDocumentsProps) {
   const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+
+  const filtered = useMemo(() => {
+    return documents.filter((doc) => {
+      const latest = doc.versions[doc.versions.length - 1];
+      const matchesSearch = !search || 
+        doc.title.toLowerCase().includes(search.toLowerCase()) ||
+        latest.docNumber.toLowerCase().includes(search.toLowerCase()) ||
+        latest.object.toLowerCase().includes(search.toLowerCase());
+      const matchesType = typeFilter === "all" || latest.docType === typeFilter;
+      return matchesSearch && matchesType;
+    });
+  }, [documents, search, typeFilter]);
 
   const handleDelete = (id: string) => {
     deleteDocument(id);
@@ -62,8 +78,34 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="px-4 pb-4 space-y-2">
-        {documents.map((doc) => {
+      <CardContent className="px-4 pb-4 space-y-3">
+        {/* Search & Filter */}
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              className="h-9 pl-8 text-sm"
+              placeholder="Търси по име, номер, обект..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="h-9 w-[110px] text-sm">
+              <Filter className="h-3.5 w-3.5 mr-1" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Всички</SelectItem>
+              <SelectItem value="protocol">Протокол</SelectItem>
+              <SelectItem value="offer">Оферта</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {filtered.length === 0 ? (
+          <p className="text-sm text-muted-foreground text-center py-4">Няма намерени документи</p>
+        ) : filtered.map((doc) => {
           const latest = doc.versions[doc.versions.length - 1];
           const isExpanded = expandedDoc === doc.id;
           
@@ -152,7 +194,8 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
               )}
             </div>
           );
-        })}
+        })
+        }
       </CardContent>
     </Card>
   );
