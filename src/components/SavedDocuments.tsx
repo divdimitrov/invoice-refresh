@@ -1,10 +1,12 @@
 import { SavedDocument, deleteDocument } from "@/lib/storage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Edit, Trash2, FileDown, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { FileText, Edit, Trash2, FileDown, Clock, ChevronDown, ChevronUp, Search, Filter } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { exportPDF } from "@/lib/pdf-export";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface SavedDocumentsProps {
   documents: SavedDocument[];
