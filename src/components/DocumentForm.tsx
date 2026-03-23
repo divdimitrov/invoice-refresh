@@ -175,6 +175,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       toast.error("Моля, изберете клиент или въведете Възложител");
       return;
     }
+    // Auto-save representative to client
+    if (signFor.trim() && currentClient) {
+      const reps = currentClient.representatives || [];
+      if (!reps.includes(signFor.trim())) {
+        const updatedClient = { ...currentClient, representatives: [...reps, signFor.trim()] };
+        onEditClient(updatedClient);
+      }
+    }
+
     const versionData = getVersionData();
     if (editingDocument) {
       addVersionToDocument(editingDocument.doc.id, versionData);
