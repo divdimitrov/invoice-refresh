@@ -421,7 +421,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Мярка</Label>
-                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" value={newProduct.unit} onChange={(e) => setNewProduct({ ...newProduct, unit: e.target.value })} />
+                  <Input className="h-11 rounded-xl bg-card border-transparent text-center" placeholder="бр." value={newProduct.unit} onChange={(e) => setNewProduct({ ...newProduct, unit: e.target.value })} />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Цена</Label>
