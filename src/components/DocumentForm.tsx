@@ -425,8 +425,8 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                           {!exactMatch && clientSearch.trim() && (
                             <button
                               className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent/60 transition-colors border-t"
-                              onClick={() => {
-                                const newClient = onAutoCreateClient({ name: clientSearch.trim() });
+                              onClick={async () => {
+                                const newClient = await onAutoCreateClient({ name: clientSearch.trim() });
                                 setAssignor(newClient.name);
                                 setClientSearch(newClient.name);
                                 setShowClientDropdown(false);
