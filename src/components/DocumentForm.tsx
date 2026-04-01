@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { exportPDF, type PdfResult } from "@/lib/pdf-export";
@@ -329,13 +329,22 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">Тип документ</Label>
-                <Select value={docType} onValueChange={setDocType}>
-                  <SelectTrigger className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30 transition-colors"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="protocol">Протокол</SelectItem>
-                    <SelectItem value="offer">Оферта</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div className="flex h-12 rounded-xl bg-muted/40 p-1 gap-1">
+                  <button
+                    type="button"
+                    className={`flex-1 rounded-lg text-sm font-medium transition-all ${docType === "protocol" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    onClick={() => setDocType("protocol")}
+                  >
+                    Протокол
+                  </button>
+                  <button
+                    type="button"
+                    className={`flex-1 rounded-lg text-sm font-medium transition-all ${docType === "offer" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    onClick={() => setDocType("offer")}
+                  >
+                    Оферта
+                  </button>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">Номер <span className="text-destructive">*</span></Label>
