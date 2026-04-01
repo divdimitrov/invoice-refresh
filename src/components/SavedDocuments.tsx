@@ -1,10 +1,11 @@
-import { SavedDocument, deleteDocument } from "@/lib/storage";
+import { SavedDocument, deleteDocument, deleteDocumentVersion } from "@/lib/storage";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Trash2, Search, Filter, Archive, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { exportPDF, type PdfResult } from "@/lib/pdf-export";
 import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
 import { VersionHistorySheet } from "@/components/VersionHistorySheet";
@@ -27,6 +28,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
   const [historyDoc, setHistoryDoc] = useState<SavedDocument | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string; versionCount: number } | null>(null);
 
   const filtered = useMemo(() => {
     return documents.filter((doc) => {
@@ -40,13 +42,33 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
     });
   }, [documents, search, typeFilter]);
 
-  const handleDelete = async (id: string) => {
+  const handleDeleteConfirmed = async () => {
+    if (!deleteConfirm) return;
     try {
-      await deleteDocument(id);
+      await deleteDocument(deleteConfirm.id);
       await onDocumentsChange();
       toast.info("Документът е изтрит");
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to delete";
+      toast.error(message);
+    }
+    setDeleteConfirm(null);
+  };
+
+  const handleDeleteVersion = async (docId: string, version: number) => {
+    try {
+      await deleteDocumentVersion(docId, version);
+      await onDocumentsChange();
+      // Refresh the history sheet document
+      if (historyDoc && historyDoc.id === docId) {
+        const updatedDoc = documents.find(d => d.id === docId);
+        if (updatedDoc && updatedDoc.versions.length <= 1) {
+          setHistoryDoc(null);
+        }
+      }
+      toast.info("Версията е изтрита");
+    } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to delete version";
       toast.error(message);
     }
   };
@@ -65,6 +87,9 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
     if (pdfPreview) URL.revokeObjectURL(pdfPreview.blobUrl);
     setPdfPreview(null);
   };
+
+  // Keep historyDoc in sync with refreshed documents
+  const currentHistoryDoc = historyDoc ? documents.find(d => d.id === historyDoc.id) || null : null;
 
   if (documents.length === 0) {
     return (
@@ -159,7 +184,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
                   </div>
                 </div>
 
-                {/* Action buttons - clean row */}
+                {/* Action buttons */}
                 <div className="flex items-center border-t px-3 py-2 gap-1 bg-muted/10">
                   <Button
                     variant="ghost"
@@ -193,7 +218,11 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
                     variant="ghost"
                     size="icon"
                     className="h-9 w-9 rounded-xl opacity-40 hover:opacity-100 shrink-0"
-                    onClick={() => handleDelete(doc.id)}
+                    onClick={() => setDeleteConfirm({
+                      id: doc.id,
+                      title: doc.title || "Документ",
+                      versionCount: doc.versions.length,
+                    })}
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
@@ -206,12 +235,36 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
     </Card>
 
     <VersionHistorySheet
-      open={!!historyDoc}
+      open={!!currentHistoryDoc}
       onClose={() => setHistoryDoc(null)}
-      document={historyDoc}
+      document={currentHistoryDoc}
       onExportVersion={handleExportVersion}
       onEditVersion={onEditDocument}
+      onDeleteVersion={handleDeleteVersion}
     />
+
+    {/* Delete document confirmation */}
+    <AlertDialog open={!!deleteConfirm} onOpenChange={(o) => !o && setDeleteConfirm(null)}>
+      <AlertDialogContent className="rounded-2xl max-w-[340px]">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-base">Изтриване на документ</AlertDialogTitle>
+          <AlertDialogDescription className="text-sm">
+            Сигурни ли сте, че искате да изтриете <strong>"{deleteConfirm?.title}"</strong>?
+            {deleteConfirm && deleteConfirm.versionCount > 1 && (
+              <span className="block mt-2 text-destructive font-medium">
+                ⚠️ Това ще изтрие всички {deleteConfirm.versionCount} версии на документа безвъзвратно.
+              </span>
+            )}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="rounded-xl">Отказ</AlertDialogCancel>
+          <AlertDialogAction className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={handleDeleteConfirmed}>
+            Изтрий
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
 
     {pdfPreview && (
       <PdfPreviewDialog
