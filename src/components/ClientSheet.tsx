@@ -13,7 +13,7 @@ interface ClientSheetProps {
   clients: Client[];
   selectedClient: string | null;
   onSelectClient: (id: string) => void;
-  onAddClient: (client: Omit<Client, "id">) => void | Promise<void>;
+  onAddClient: (client: Omit<Client, "id">) => void | Promise<void> | Promise<Client>;
   onDeleteClient: (id: string) => void | Promise<void>;
   onEditClient: (client: Client) => void | Promise<void>;
 }

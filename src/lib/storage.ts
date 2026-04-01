@@ -124,7 +124,7 @@ function versionDataPayload(v: Omit<DocumentVersion, "version" | "savedAt">) {
 }
 
 async function requireOk<T>(
-  p: Promise<{ data: T | null; error: { message: string } | null }>,
+  p: PromiseLike<{ data: T | null; error: { message: string } | null }>,
   context: string
 ): Promise<T> {
   const { data, error } = await p;
@@ -134,7 +134,7 @@ async function requireOk<T>(
 }
 
 async function requireNoError(
-  p: Promise<{ error: { message: string } | null }>,
+  p: PromiseLike<{ error: { message: string } | null }>,
   context: string
 ): Promise<void> {
   const { error } = await p;
