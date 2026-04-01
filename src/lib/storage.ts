@@ -248,6 +248,13 @@ export async function deleteDocument(id: string): Promise<void> {
   await requireNoError(supabase.from("documents").delete().eq("id", id), "deleteDocument");
 }
 
+export async function deleteDocumentVersion(docId: string, version: number): Promise<void> {
+  await requireNoError(
+    supabase.from("document_versions").delete().eq("document_id", docId).eq("version", version),
+    "deleteDocumentVersion"
+  );
+}
+
 export async function addVersionToDocument(
   docId: string,
   version: Omit<DocumentVersion, "version" | "savedAt">
