@@ -1,17 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  // Fail fast so we don't silently fall back to localStorage in production.
-  // Set these in `.env.local` (dev) or in your hosting provider env vars.
-  throw new Error("Missing Supabase env vars: VITE_SUPABASE_URL and/or VITE_SUPABASE_ANON_KEY");
-}
+const supabaseUrl = "https://ksdpfgxzduixjyjzyfzj.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzZHBmZ3h6ZHVpeGp5anp5ZnpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyOTMyMTMsImV4cCI6MjA4OTg2OTIxM30.CwnVGrleC7k6QS0LOtYXJLfy5BhhjBLrabsGzAGdySw";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    // This app currently has no auth flow; we avoid storing sessions implicitly.
     persistSession: false,
     autoRefreshToken: false,
     detectSessionInUrl: false,
