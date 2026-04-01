@@ -3,10 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Trash2, Clock, ChevronDown, Search, Filter, Archive } from "lucide-react";
+import { FileText, Trash2, Search, Filter, Archive, Clock } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { exportPDF, type PdfResult } from "@/lib/pdf-export";
 import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
+import { VersionHistorySheet } from "@/components/VersionHistorySheet";
 import { toast } from "sonner";
 import { useState, useMemo } from "react";
 
@@ -16,11 +17,16 @@ interface SavedDocumentsProps {
   onEditDocument: (doc: SavedDocument, versionIndex: number) => void;
 }
 
+function formatShortDate(dateStr: string) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("bg-BG", { day: "numeric", month: "short" });
+}
+
 export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }: SavedDocumentsProps) {
-  const [expandedDoc, setExpandedDoc] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
+  const [historyDoc, setHistoryDoc] = useState<SavedDocument | null>(null);
 
   const filtered = useMemo(() => {
     return documents.filter((doc) => {
@@ -123,8 +129,10 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
             </motion.p>
           ) : filtered.map((doc, i) => {
             const latest = doc.versions[doc.versions.length - 1];
-            const isExpanded = expandedDoc === doc.id;
-            const docColor = latest.docType === "protocol" ? "bg-accent text-accent-foreground" : "bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400";
+            const docColor = latest.docType === "protocol" 
+              ? "bg-accent text-accent-foreground" 
+              : "bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400";
+            const hasHistory = doc.versions.length > 1;
 
             return (
               <motion.div
@@ -136,78 +144,75 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
                 transition={{ duration: 0.3, delay: i * 0.03 }}
                 className="rounded-xl border bg-card overflow-hidden hover:border-primary/10 transition-colors"
               >
-                <div className="flex items-center gap-3 p-3.5">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl shrink-0 ${docColor}`}>
+                <div className="flex items-start gap-3 p-3.5">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl shrink-0 mt-0.5 ${docColor}`}>
                     <FileText className="h-4.5 w-4.5" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm truncate">{doc.title || "Документ"}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground">
-                        v{latest.version}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(doc.updatedAt).toLocaleDateString("bg-BG")} {new Date(doc.updatedAt).toLocaleTimeString("bg-BG", { hour: "2-digit", minute: "2-digit" })}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-medium gap-1" onClick={() => handleExportVersion(doc, doc.versions.length - 1)}>
-                      PDF
-                    </Button>
-                    <Button variant="ghost" size="sm" className="h-8 rounded-lg text-xs font-medium gap-1" onClick={() => onEditDocument(doc, doc.versions.length - 1)}>
-                      Промени
-                    </Button>
-                    {doc.versions.length > 1 && (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" onClick={() => setExpandedDoc(isExpanded ? null : doc.id)}>
-                        <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                          <ChevronDown className="h-4 w-4" />
-                        </motion.div>
-                      </Button>
-                    )}
-                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg opacity-50 hover:opacity-100" onClick={() => handleDelete(doc.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {latest.docType === "protocol" ? "Протокол" : "Оферта"} • {latest.docNumber}
+                    </p>
+                    <p className="text-xs text-muted-foreground/70 mt-0.5">
+                      Последна промяна: {formatShortDate(doc.updatedAt)}
+                    </p>
                   </div>
                 </div>
 
-                <AnimatePresence>
-                  {isExpanded && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
+                {/* Action buttons - clean row */}
+                <div className="flex items-center border-t px-3 py-2 gap-1 bg-muted/10">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 rounded-xl text-xs font-medium flex-1"
+                    onClick={() => handleExportVersion(doc, doc.versions.length - 1)}
+                  >
+                    <FileText className="h-3.5 w-3.5 mr-1.5" />
+                    PDF
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 rounded-xl text-xs font-medium flex-1"
+                    onClick={() => onEditDocument(doc, doc.versions.length - 1)}
+                  >
+                    Промени
+                  </Button>
+                  {hasHistory && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-9 rounded-xl text-xs font-medium flex-1 text-muted-foreground"
+                      onClick={() => setHistoryDoc(doc)}
                     >
-                      <div className="border-t bg-muted/20 px-4 py-3 space-y-1.5">
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5 mb-2">
-                          <Clock className="h-3 w-3" /> История на версиите
-                        </p>
-                        {doc.versions.map((v, idx) => (
-                          <div key={idx} className="flex items-center gap-2 text-xs py-2 px-2.5 rounded-lg hover:bg-muted/40 transition-colors">
-                            <span className="font-bold text-foreground">v{v.version}</span>
-                            <span className="text-muted-foreground flex-1">
-                              {new Date(v.savedAt).toLocaleString("bg-BG")}
-                            </span>
-                            <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] font-medium" onClick={() => handleExportVersion(doc, idx)}>
-                              PDF
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-7 rounded-lg text-[11px] font-medium" onClick={() => onEditDocument(doc, idx)}>
-                              Промени
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </motion.div>
+                      <Clock className="h-3.5 w-3.5 mr-1.5" />
+                      История ({doc.versions.length})
+                    </Button>
                   )}
-                </AnimatePresence>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 rounded-xl opacity-40 hover:opacity-100 shrink-0"
+                    onClick={() => handleDelete(doc.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </motion.div>
             );
           })}
         </AnimatePresence>
       </CardContent>
     </Card>
+
+    <VersionHistorySheet
+      open={!!historyDoc}
+      onClose={() => setHistoryDoc(null)}
+      document={historyDoc}
+      onExportVersion={handleExportVersion}
+      onEditVersion={onEditDocument}
+    />
+
     {pdfPreview && (
       <PdfPreviewDialog
         open
