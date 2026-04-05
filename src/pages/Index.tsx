@@ -3,7 +3,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ClientSheet } from "@/components/ClientSheet";
 import { DocumentForm } from "@/components/DocumentForm";
 import { SavedDocuments } from "@/components/SavedDocuments";
-import { Sparkles, FileText } from "lucide-react";
+import { ChangePinDialog } from "@/components/ChangePinDialog";
+import { Sparkles, FileText, LogOut, KeyRound } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
   type Client, type SavedDocument,
