@@ -14,11 +14,13 @@ import {
 } from "@/lib/storage";
 
 const Index = () => {
+  const { logout } = useAuth();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
   const [clientDocuments, setClientDocuments] = useState<SavedDocument[]>([]);
   const [editingDocument, setEditingDocument] = useState<{ doc: SavedDocument; versionIndex: number } | null>(null);
+  const [changePinOpen, setChangePinOpen] = useState(false);
 
   const selectedClient = clients.find(c => c.id === selectedClientId) || null;
 
