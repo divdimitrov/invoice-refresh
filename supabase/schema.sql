@@ -137,3 +137,76 @@ create policy "anon_versions_delete" on public.document_versions for delete to a
 
 -- NOTE: When you add Supabase Auth, drop the anon policies above
 -- and create authenticated-user policies scoped to user id.
+
+-- ============================================================
+-- PIN-based access control
+-- ============================================================
+
+create extension if not exists pgcrypto;
+
+create table if not exists public.access_pins (
+  id uuid primary key default gen_random_uuid(),
+  label text not null default 'default',
+  pin_hash text not null,
+  must_change boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+alter table public.access_pins enable row level security;
+
+-- Only allow reading via RPC (security definer), block direct access
+create policy "no_direct_access" on public.access_pins for select to anon using (false);
+
+-- Verify PIN: returns JSON with valid, must_change, id
+create or replace function public.verify_pin(p_pin text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  rec record;
+begin
+  select id, must_change into rec
+  from public.access_pins
+  where pin_hash = encode(digest(p_pin, 'sha256'), 'hex')
+  limit 1;
+
+  if rec.id is null then
+    return '{"valid": false}'::jsonb;
+  end if;
+
+  return jsonb_build_object('valid', true, 'must_change', rec.must_change, 'id', rec.id);
+end;
+$$;
+
+-- Change PIN
+create or replace function public.change_pin(p_id uuid, p_old_pin text, p_new_pin text)
+returns boolean
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  -- Verify old PIN matches
+  if not exists (
+    select 1 from public.access_pins
+    where id = p_id
+      and pin_hash = encode(digest(p_old_pin, 'sha256'), 'hex')
+  ) then
+    return false;
+  end if;
+
+  update public.access_pins
+  set pin_hash = encode(digest(p_new_pin, 'sha256'), 'hex'),
+      must_change = false
+  where id = p_id;
+
+  return true;
+end;
+$$;
+
+-- To create an initial PIN, run this in Supabase SQL Editor:
+-- INSERT INTO public.access_pins (label, pin_hash)
+-- VALUES ('main', encode(digest('1234', 'sha256'), 'hex'));
+-- (Replace '1234' with your desired PIN)
