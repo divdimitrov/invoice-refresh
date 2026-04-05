@@ -145,7 +145,35 @@ const Index = () => {
             </div>
             <h1 className="text-sm font-semibold text-foreground tracking-tight">Фактуриране</h1>
           </div>
-          <AnimatePresence>
+          <div className="flex items-center gap-1.5">
+            <AnimatePresence>
+              {selectedClient && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-accent-foreground"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  <span className="text-xs font-medium truncate max-w-[100px]">{selectedClient.name}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <button
+              onClick={() => setChangePinOpen(true)}
+              className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-accent transition-colors"
+              title="Смяна на PIN"
+            >
+              <KeyRound className="h-4 w-4 text-muted-foreground" />
+            </button>
+            <button
+              onClick={logout}
+              className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-destructive/10 transition-colors"
+              title="Изход"
+            >
+              <LogOut className="h-4 w-4 text-destructive" />
+            </button>
+          </div>
             {selectedClient && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
