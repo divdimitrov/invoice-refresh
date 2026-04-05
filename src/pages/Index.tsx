@@ -174,20 +174,10 @@ const Index = () => {
               <LogOut className="h-4 w-4 text-destructive" />
             </button>
           </div>
-            {selectedClient && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-accent text-accent-foreground"
-              >
-                <Sparkles className="h-3 w-3" />
-                <span className="text-xs font-medium truncate max-w-[100px]">{selectedClient.name}</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </header>
+
+      <ChangePinDialog open={changePinOpen} onOpenChange={setChangePinOpen} />
 
       {/* Content */}
       <main className="px-4 py-5 max-w-lg mx-auto space-y-5">
