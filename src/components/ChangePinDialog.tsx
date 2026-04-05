@@ -35,12 +35,12 @@ export function ChangePinDialog({ open, onOpenChange, forced = false }: ChangePi
 
   const handleSubmit = async () => {
     if (step === "old") {
-      if (oldPin.length < 4) return;
+      if (oldPin.length < 6) return;
       setStep("new");
       return;
     }
     if (step === "new") {
-      if (newPin.length < 4) return;
+      if (newPin.length < 6) return;
       setStep("confirm");
       return;
     }
@@ -132,7 +132,7 @@ export function ChangePinDialog({ open, onOpenChange, forced = false }: ChangePi
             )}
             <Button
               onClick={handleSubmit}
-              disabled={loading || currentValue.length < 4}
+              disabled={loading || currentValue.length < 6}
               className="flex-1"
             >
               {loading ? "Запазване..." : step === "confirm" ? "Запази" : "Напред"}

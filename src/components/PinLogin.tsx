@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
-const PIN_LENGTH = 4;
+const PIN_LENGTH = 6;
 
 export function PinLogin() {
   const { login } = useAuth();

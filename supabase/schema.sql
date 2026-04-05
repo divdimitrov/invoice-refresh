@@ -187,14 +187,27 @@ language plpgsql
 security definer
 set search_path = public
 as $$
+declare
+  is_forced boolean;
 begin
-  -- Verify old PIN matches
-  if not exists (
-    select 1 from public.access_pins
-    where id = p_id
-      and pin_hash = encode(digest(p_old_pin, 'sha256'), 'hex')
-  ) then
+  -- Check if this is a forced change (must_change = true)
+  select must_change into is_forced
+  from public.access_pins
+  where id = p_id;
+
+  if is_forced is null then
     return false;
+  end if;
+
+  -- Skip old PIN check only when must_change is true (forced change)
+  if not is_forced then
+    if not exists (
+      select 1 from public.access_pins
+      where id = p_id
+        and pin_hash = encode(digest(p_old_pin, 'sha256'), 'hex')
+    ) then
+      return false;
+    end if;
   end if;
 
   update public.access_pins
