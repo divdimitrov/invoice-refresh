@@ -84,6 +84,11 @@ function mapClient(row: DbClientRow): Client {
   };
 }
 
+const migrateLegacyName = (s: string) =>
+  (s || "")
+    .replace(/Александър\s+Строй\s+ЕООД/gi, "Караманов Груп ЕООД")
+    .replace(/Александър\s+Строй/gi, "Караманов Груп");
+
 function mapVersion(row: DbVersionRow): DocumentVersion {
   const data = row.data as Partial<Omit<DocumentVersion, "version" | "savedAt">>;
   return {
@@ -92,13 +97,13 @@ function mapVersion(row: DbVersionRow): DocumentVersion {
     docType: data.docType || "protocol",
     docNumber: data.docNumber || "",
     assignor: data.assignor || "",
-    executor: data.executor || "",
+    executor: migrateLegacyName(data.executor || ""),
     object: data.object || "",
     startDate: data.startDate || "",
     endDate: data.endDate || "",
     signFor: data.signFor || "",
-    signBy: data.signBy || "",
-    protocolText: data.protocolText || "",
+    signBy: migrateLegacyName(data.signBy || ""),
+    protocolText: migrateLegacyName(data.protocolText || ""),
     products: (data.products as Product[]) || [],
   };
 }
