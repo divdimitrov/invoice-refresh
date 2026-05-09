@@ -17,7 +17,7 @@ interface DocumentFormProps {
   selectedClient: Client | null;
   editingDocument: { doc: SavedDocument; versionIndex: number } | null;
   onClearEdit: () => void;
-  onDocumentSaved: () => void | Promise<void>;
+  onDocumentSaved: (clientId?: string) => void | Promise<void>;
   onAutoCreateClient: (clientData: Omit<Client, "id">) => Promise<Client>;
   onSelectClient: (id: string) => void;
   onEditClient: (client: Client) => void | Promise<void>;
@@ -220,7 +220,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
         });
         toast.success("Документът е запазен!");
       }
-      await onDocumentSaved();
+      await onDocumentSaved(currentClient.id);
       resetForm();
     } catch (e) {
       const message = e instanceof Error ? e.message : "Save failed";
