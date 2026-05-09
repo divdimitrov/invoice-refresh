@@ -27,7 +27,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [docType, setDocType] = useState("protocol");
   const [docNumber, setDocNumber] = useState("");
   const [assignor, setAssignor] = useState("");
-  const [executor, setExecutor] = useState("Александър Строй ЕООД");
+  const [executor, setExecutor] = useState("Караманов Груп ЕООД");
   const [object, setObject] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
