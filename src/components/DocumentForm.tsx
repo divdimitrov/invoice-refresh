@@ -125,7 +125,32 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
 
   const removeProduct = (id: string) => {
     setProducts(products.filter((p) => p.id !== id));
+    if (editingProductId === id) setEditingProductId(null);
     toast.info("Продуктът е премахнат");
+  };
+
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<{ name: string; quantity: string; unit: string; price: string }>({ name: "", quantity: "", unit: "", price: "" });
+
+  const startEditProduct = (p: Product) => {
+    setEditingProductId(p.id);
+    setEditDraft({ name: p.name, quantity: String(p.quantity), unit: p.unit, price: String(p.price) });
+  };
+
+  const cancelEditProduct = () => {
+    setEditingProductId(null);
+  };
+
+  const saveEditProduct = (id: string) => {
+    const qty = Number(editDraft.quantity);
+    const prc = Number(editDraft.price);
+    if (!editDraft.name.trim()) { toast.error("Моля, въведете име на продукта"); return; }
+    if (!qty || qty <= 0) { toast.error("Моля, въведете количество"); return; }
+    if (!editDraft.unit.trim()) { toast.error("Моля, въведете мярка"); return; }
+    if (!prc || prc <= 0) { toast.error("Моля, въведете цена"); return; }
+    setProducts(products.map((p) => p.id === id ? { ...p, name: editDraft.name.trim(), quantity: qty, unit: editDraft.unit.trim(), price: prc } : p));
+    setEditingProductId(null);
+    toast.success("Продуктът е обновен");
   };
 
   const total = products.reduce((sum, p) => sum + p.quantity * p.price, 0);
