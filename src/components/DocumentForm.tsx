@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
-import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw } from "lucide-react";
+import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, ShoppingBag, Search, UserPlus, Check, RotateCcw, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import { exportPDF, type PdfResult } from "@/lib/pdf-export";
 import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
