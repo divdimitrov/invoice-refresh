@@ -690,12 +690,14 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                             <p className="font-bold text-sm">{(p.quantity * p.price).toFixed(2)}</p>
                             <p className="text-[10px] text-muted-foreground font-medium">€</p>
                           </div>
-                          <Button variant="ghost" size="sm" className="h-9 shrink-0 rounded-xl px-3 text-xs font-medium opacity-70 group-hover:opacity-100 transition-opacity" onClick={() => startEditProduct(p)}>
-                            Промени
-                          </Button>
-                          <Button variant="ghost" size="sm" className="h-9 shrink-0 rounded-xl px-3 text-xs font-medium text-destructive opacity-70 group-hover:opacity-100 transition-opacity" onClick={() => removeProduct(p.id)}>
-                            Премахни
-                          </Button>
+                          <div className="flex flex-col gap-1 shrink-0">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg opacity-70 group-hover:opacity-100 transition-opacity" onClick={() => startEditProduct(p)} title="Промени" aria-label="Промени">
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-destructive opacity-70 group-hover:opacity-100 transition-opacity" onClick={() => removeProduct(p.id)} title="Премахни" aria-label="Премахни">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </div>
                         </div>
                       )}
                     </motion.div>
