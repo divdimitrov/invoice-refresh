@@ -27,7 +27,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [docType, setDocType] = useState("protocol");
   const [docNumber, setDocNumber] = useState("");
   const [assignor, setAssignor] = useState("");
-  const [executor, setExecutor] = useState("Александър Строй ЕООД");
+  const [executor, setExecutor] = useState("Караманов Груп ЕООД");
   const [object, setObject] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -151,7 +151,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setDocNumber("");
     setAssignor(selectedClient?.name || "");
     setClientSearch(selectedClient?.name || "");
-    setExecutor("Александър Строй ЕООД");
+    setExecutor("Караманов Груп ЕООД");
     setObject("");
     setStartDate("");
     setEndDate("");
@@ -264,7 +264,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 setSignFor("");
                 setDocType("protocol");
                 setDocNumber("");
-                setExecutor("Александър Строй ЕООД");
+                setExecutor("Караманов Груп ЕООД");
                 setObject("");
                 setStartDate("");
                 setEndDate("");
