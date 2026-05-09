@@ -151,7 +151,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setDocNumber("");
     setAssignor(selectedClient?.name || "");
     setClientSearch(selectedClient?.name || "");
-    setExecutor("Александър Строй ЕООД");
+    setExecutor("Караманов Груп ЕООД");
     setObject("");
     setStartDate("");
     setEndDate("");
@@ -264,7 +264,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 setSignFor("");
                 setDocType("protocol");
                 setDocNumber("");
-                setExecutor("Александър Строй ЕООД");
+                setExecutor("Караманов Груп ЕООД");
                 setObject("");
                 setStartDate("");
                 setEndDate("");
