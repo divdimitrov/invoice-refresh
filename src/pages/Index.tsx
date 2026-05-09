@@ -38,10 +38,11 @@ const Index = () => {
     })();
   }, []);
 
-  const refreshDocuments = useCallback(async () => {
-    if (!selectedClientId) return;
+  const refreshDocuments = useCallback(async (clientId?: string) => {
+    const id = clientId ?? selectedClientId;
+    if (!id) return;
     try {
-      const docs = await getClientDocuments(selectedClientId);
+      const docs = await getClientDocuments(id);
       setClientDocuments(docs);
     } catch (e) {
       const message = e instanceof Error ? e.message : "Failed to load documents";
