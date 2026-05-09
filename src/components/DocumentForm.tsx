@@ -639,22 +639,65 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20, transition: { duration: 0.2 } }}
                       transition={{ duration: 0.3, delay: i * 0.03 }}
-                      className="group flex items-center gap-3 p-3.5 rounded-xl bg-muted/30 border border-transparent hover:border-primary/10 hover:bg-muted/50 transition-all"
+                      className="group p-3.5 rounded-xl bg-muted/30 border border-transparent hover:border-primary/10 hover:bg-muted/50 transition-all"
                     >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent shrink-0 text-sm font-bold text-accent-foreground">
-                        {i + 1}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm truncate">{p.name}</p>
-                        <p className="text-xs text-muted-foreground mt-0.5">{p.quantity} {p.unit} × {p.price.toFixed(2)} €</p>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="font-bold text-sm">{(p.quantity * p.price).toFixed(2)}</p>
-                        <p className="text-[10px] text-muted-foreground font-medium">€</p>
-                      </div>
-                      <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-xl opacity-50 group-hover:opacity-100 transition-opacity" onClick={() => removeProduct(p.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      {editingProductId === p.id ? (
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent shrink-0 text-sm font-bold text-accent-foreground">
+                              {i + 1}
+                            </div>
+                            <Input
+                              className="h-11 rounded-xl bg-card border-transparent flex-1"
+                              placeholder="Име на продукт"
+                              value={editDraft.name}
+                              onChange={(e) => setEditDraft({ ...editDraft, name: e.target.value })}
+                            />
+                          </div>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="space-y-1">
+                              <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">К-во</Label>
+                              <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={0} step={0.01} value={editDraft.quantity} onChange={(e) => setEditDraft({ ...editDraft, quantity: e.target.value })} />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Мярка</Label>
+                              <Input className="h-11 rounded-xl bg-card border-transparent text-center" value={editDraft.unit} onChange={(e) => setEditDraft({ ...editDraft, unit: e.target.value })} />
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Цена</Label>
+                              <Input className="h-11 rounded-xl bg-card border-transparent text-center" type="number" min={0} step={0.01} value={editDraft.price} onChange={(e) => setEditDraft({ ...editDraft, price: e.target.value })} />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="ghost" className="flex-1 h-11 rounded-xl text-sm" onClick={cancelEditProduct}>
+                              Отказ
+                            </Button>
+                            <Button className="flex-1 h-11 rounded-xl text-sm font-semibold gradient-bg hover:opacity-90" onClick={() => saveEditProduct(p.id)}>
+                              Запази
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent shrink-0 text-sm font-bold text-accent-foreground">
+                            {i + 1}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm truncate">{p.name}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{p.quantity} {p.unit} × {p.price.toFixed(2)} €</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="font-bold text-sm">{(p.quantity * p.price).toFixed(2)}</p>
+                            <p className="text-[10px] text-muted-foreground font-medium">€</p>
+                          </div>
+                          <Button variant="ghost" size="sm" className="h-9 shrink-0 rounded-xl px-3 text-xs font-medium opacity-70 group-hover:opacity-100 transition-opacity" onClick={() => startEditProduct(p)}>
+                            Промени
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-9 shrink-0 rounded-xl px-3 text-xs font-medium text-destructive opacity-70 group-hover:opacity-100 transition-opacity" onClick={() => removeProduct(p.id)}>
+                            Премахни
+                          </Button>
+                        </div>
+                      )}
                     </motion.div>
                   ))}
 
