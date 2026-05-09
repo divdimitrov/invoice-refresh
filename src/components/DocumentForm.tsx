@@ -86,13 +86,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       setDocType(v.docType);
       setDocNumber(v.docNumber);
       setAssignor(v.assignor);
-      setExecutor(v.executor);
+      // Migrate legacy company name
+      const migrate = (s: string) => (s || "").replace(/Александър\s+Строй\s+ЕООД/gi, "Караманов Груп ЕООД").replace(/Александър\s+Строй/gi, "Караманов Груп");
+      setExecutor(migrate(v.executor));
       setObject(v.object);
       setStartDate(v.startDate);
       setEndDate(v.endDate);
       setSignFor(v.signFor);
-      setSignBy(v.signBy);
-      setProtocolText(v.protocolText);
+      setSignBy(migrate(v.signBy));
+      setProtocolText(migrate(v.protocolText));
       setProducts(v.products.map(p => ({ ...p })));
     }
   }, [editingDocument]);
