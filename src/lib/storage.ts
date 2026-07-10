@@ -86,8 +86,8 @@ function mapClient(row: DbClientRow): Client {
 
 const migrateLegacyName = (s: string) =>
   (s || "")
-    .replace(/Александър\s+Строй\s+ЕООД/gi, "Караманов Груп ЕООД")
-    .replace(/Александър\s+Строй/gi, "Караманов Груп");
+    .replace(/Караманов\s+Груп(?!\s+ЕООД)/gi, "Караманов Груп ЕООД")
+    .replace(/Александър\s+Строй(?!\s+ЕООД)/gi, "Александър Строй ЕООД");
 
 function mapVersion(row: DbVersionRow): DocumentVersion {
   const data = row.data as Partial<Omit<DocumentVersion, "version" | "savedAt">>;
