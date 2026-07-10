@@ -504,7 +504,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                       onClick={() => setExecutor(opt)}
                       className={`rounded-lg text-xs font-medium transition-colors px-2 ${executor === opt ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                     >
-                      {opt.replace(" ЕООД", "")}
+                      {opt}
                     </button>
                   ))}
                 </div>
