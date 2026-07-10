@@ -496,7 +496,18 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Briefcase className="h-3 w-3" />Изпълнител</Label>
-                <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" value={executor} onChange={(e) => setExecutor(e.target.value)} />
+                <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-muted/40 h-12">
+                  {["Караманов Груп ЕООД", "Александър Строй ЕООД"].map((opt) => (
+                    <button
+                      key={opt}
+                      type="button"
+                      onClick={() => setExecutor(opt)}
+                      className={`rounded-lg text-xs font-medium transition-colors px-2 ${executor === opt ? "bg-background shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    >
+                      {opt.replace(" ЕООД", "")}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
