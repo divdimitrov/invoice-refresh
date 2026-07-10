@@ -3,6 +3,7 @@ import autoTable from "jspdf-autotable";
 import { robotoRegular } from "./roboto-regular";
 import { robotoBold } from "./roboto-bold";
 import { logoBase64 } from "./logo-base64";
+import { logoAlexanderBase64 } from "./logo-alexander-base64";
 
 interface Product {
   id: string;
