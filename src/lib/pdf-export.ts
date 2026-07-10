@@ -65,10 +65,12 @@ export function exportPDF(data: DocumentData) {
   doc.setFillColor(C.accent[0], C.accent[1], C.accent[2]);
   doc.rect(0, 0, pw, 2.5, "F");
 
-  // ── Logo ──
+  // ── Logo (depends on executor) ──
   try {
+    const isAlexander = /Александър\s+Строй/i.test(data.executor);
+    const logo = isAlexander ? logoAlexanderBase64 : logoBase64;
     // Logo is 3:2, render at ~40x26mm — large and clear
-    doc.addImage(logoBase64, "PNG", m, y, 40, 26);
+    doc.addImage(logo, "PNG", m, y, 40, 26);
   } catch {
     // skip
   }
