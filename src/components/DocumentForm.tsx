@@ -10,7 +10,7 @@ import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, S
 import { toast } from "sonner";
 import { exportPDF, type PdfResult } from "@/lib/pdf-export";
 import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
-import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
+import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument, docTypeLabel } from "@/lib/storage";
 
 interface DocumentFormProps {
   clients: Client[];
@@ -48,6 +48,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: "" as string | number, unit: "", price: "" as string | number });
+  const [city, setCity] = useState("");
+  const [assignorEik, setAssignorEik] = useState("");
+  const [assignorAddress, setAssignorAddress] = useState("");
+  const [executorEik, setExecutorEik] = useState("");
+  const [executorAddress, setExecutorAddress] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
+  const [warrantyMonths, setWarrantyMonths] = useState("");
+  const [penaltyPercent, setPenaltyPercent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
 
