@@ -57,6 +57,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [bankAccount, setBankAccount] = useState("");
   const [warrantyMonths, setWarrantyMonths] = useState("");
   const [penaltyPercent, setPenaltyPercent] = useState("");
+  const [contractPrice, setContractPrice] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
 
@@ -117,6 +118,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       setBankAccount(v.bankAccount || "");
       setWarrantyMonths(v.warrantyMonths || "");
       setPenaltyPercent(v.penaltyPercent || "");
+      setContractPrice(v.contractPrice || "");
     }
   }, [editingDocument]);
 
@@ -180,7 +182,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     docType, docNumber, assignor, executor, object,
     startDate, endDate, signFor, signBy, protocolText, products,
     city, assignorEik, assignorAddress, executorEik, executorAddress,
-    paymentTerms, bankAccount, warrantyMonths, penaltyPercent,
+    paymentTerms, bankAccount, warrantyMonths, penaltyPercent, contractPrice,
   });
 
   const handleExport = () => {
@@ -218,6 +220,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setBankAccount("");
     setWarrantyMonths("");
     setPenaltyPercent("");
+    setContractPrice("");
     onClearEdit();
   };
 
@@ -593,6 +596,10 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                   <Input className="h-12 rounded-xl bg-card border-transparent" value={executorAddress} onChange={(e) => setExecutorAddress(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground">Цена по договора</Label>
+                  <Input className="h-12 rounded-xl bg-card border-transparent" placeholder="Напр. 12 000 € без ДДС" value={contractPrice} onChange={(e) => setContractPrice(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
                   <Label className="text-xs font-medium text-muted-foreground">Условия на плащане</Label>
                   <Textarea rows={3} className="resize-y text-sm rounded-xl bg-card border-transparent" placeholder="Напр. 50% авансово, 50% след приемане" value={paymentTerms} onChange={(e) => setPaymentTerms(e.target.value)} />
                 </div>
@@ -666,6 +673,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       </motion.div>
 
       {/* Products */}
+      {docType !== "contract" && (
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -804,6 +812,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
           </CardContent>
         </Card>
       </motion.div>
+      )}
 
       {/* Sticky bottom action bar */}
       <div className="fixed bottom-0 left-0 right-0 z-50 glass border-t safe-bottom">

@@ -84,6 +84,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
       executorEik: v.executorEik, executorAddress: v.executorAddress,
       paymentTerms: v.paymentTerms, bankAccount: v.bankAccount,
       warrantyMonths: v.warrantyMonths, penaltyPercent: v.penaltyPercent,
+      contractPrice: v.contractPrice,
     }));
   };
 
