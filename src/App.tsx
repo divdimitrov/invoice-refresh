@@ -8,6 +8,8 @@ import { PinLogin } from "@/components/PinLogin";
 import { ChangePinDialog } from "@/components/ChangePinDialog";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import TmpContractPreview from "./pages/TmpContractPreview.tsx";
+
 
 const queryClient = new QueryClient();
 
