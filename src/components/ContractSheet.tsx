@@ -22,7 +22,7 @@ export interface ContractSheetProps {
   warrantyMonths: string; setWarrantyMonths: (v: string) => void;
   penaltyPercent: string; setPenaltyPercent: (v: string) => void;
   executorOptions: string[];
-  assignorOptions: string[];
+  assignorOptions?: string[];
   repOptions: string[];
 }
 
