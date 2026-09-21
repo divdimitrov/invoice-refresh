@@ -1,4 +1,4 @@
-import { SavedDocument, deleteDocument, deleteDocumentVersion } from "@/lib/storage";
+import { SavedDocument, deleteDocument, deleteDocumentVersion, docTypeLabel } from "@/lib/storage";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,6 +80,10 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
       executor: v.executor, object: v.object, startDate: v.startDate,
       endDate: v.endDate, signFor: v.signFor, signBy: v.signBy,
       protocolText: v.protocolText, products: v.products,
+      city: v.city, assignorEik: v.assignorEik, assignorAddress: v.assignorAddress,
+      executorEik: v.executorEik, executorAddress: v.executorAddress,
+      paymentTerms: v.paymentTerms, bankAccount: v.bankAccount,
+      warrantyMonths: v.warrantyMonths, penaltyPercent: v.penaltyPercent,
     }));
   };
 
@@ -137,6 +141,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
               <SelectItem value="all">Всички</SelectItem>
               <SelectItem value="protocol">Протокол</SelectItem>
               <SelectItem value="offer">Оферта</SelectItem>
+              <SelectItem value="contract">Договор</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -154,9 +159,11 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
             </motion.p>
           ) : filtered.map((doc, i) => {
             const latest = doc.versions[doc.versions.length - 1];
-            const docColor = latest.docType === "protocol" 
-              ? "bg-accent text-accent-foreground" 
-              : "bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400";
+            const docColor = latest.docType === "protocol"
+              ? "bg-accent text-accent-foreground"
+              : latest.docType === "contract"
+                ? "bg-primary/10 text-primary"
+                : "bg-orange-50 text-orange-600 dark:bg-orange-950 dark:text-orange-400";
             const hasHistory = doc.versions.length > 1;
 
             return (
@@ -176,7 +183,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm truncate">{doc.title || "Документ"}</p>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      {latest.docType === "protocol" ? "Протокол" : "Оферта"} • {latest.docNumber}
+                      {docTypeLabel(latest.docType)} • {latest.docNumber}
                     </p>
                     <p className="text-xs text-muted-foreground/70 mt-0.5">
                       Последна промяна: {formatShortDate(doc.updatedAt)}

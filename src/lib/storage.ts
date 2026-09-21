@@ -32,6 +32,22 @@ export interface DocumentVersion {
   signBy: string;
   protocolText: string;
   products: Product[];
+  // Договор за СМР (по избор)
+  city?: string;
+  assignorEik?: string;
+  assignorAddress?: string;
+  executorEik?: string;
+  executorAddress?: string;
+  paymentTerms?: string;
+  bankAccount?: string;
+  warrantyMonths?: string;
+  penaltyPercent?: string;
+}
+
+export function docTypeLabel(docType: string) {
+  if (docType === "protocol") return "Протокол";
+  if (docType === "contract") return "Договор";
+  return "Оферта";
 }
 
 export interface SavedDocument {
@@ -105,11 +121,20 @@ function mapVersion(row: DbVersionRow): DocumentVersion {
     signBy: migrateLegacyName(data.signBy || ""),
     protocolText: migrateLegacyName(data.protocolText || ""),
     products: (data.products as Product[]) || [],
+    city: data.city || "",
+    assignorEik: data.assignorEik || "",
+    assignorAddress: data.assignorAddress || "",
+    executorEik: data.executorEik || "",
+    executorAddress: data.executorAddress || "",
+    paymentTerms: data.paymentTerms || "",
+    bankAccount: data.bankAccount || "",
+    warrantyMonths: data.warrantyMonths || "",
+    penaltyPercent: data.penaltyPercent || "",
   };
 }
 
 function titleFromVersion(v: Pick<DocumentVersion, "docType" | "docNumber">) {
-  return `${v.docType === "protocol" ? "Протокол" : "Оферта"}${v.docNumber ? ` ${v.docNumber}` : ""}`;
+  return `${docTypeLabel(v.docType)}${v.docNumber ? ` ${v.docNumber}` : ""}`;
 }
 
 function versionDataPayload(v: Omit<DocumentVersion, "version" | "savedAt">) {
@@ -125,6 +150,15 @@ function versionDataPayload(v: Omit<DocumentVersion, "version" | "savedAt">) {
     signBy: v.signBy,
     protocolText: v.protocolText,
     products: v.products,
+    city: v.city ?? "",
+    assignorEik: v.assignorEik ?? "",
+    assignorAddress: v.assignorAddress ?? "",
+    executorEik: v.executorEik ?? "",
+    executorAddress: v.executorAddress ?? "",
+    paymentTerms: v.paymentTerms ?? "",
+    bankAccount: v.bankAccount ?? "",
+    warrantyMonths: v.warrantyMonths ?? "",
+    penaltyPercent: v.penaltyPercent ?? "",
   };
 }
 

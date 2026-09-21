@@ -10,7 +10,7 @@ import { Plus, Trash2, Save, Package, X, FileText, Briefcase, Calendar, Users, S
 import { toast } from "sonner";
 import { exportPDF, type PdfResult } from "@/lib/pdf-export";
 import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
-import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument } from "@/lib/storage";
+import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument, docTypeLabel } from "@/lib/storage";
 
 interface DocumentFormProps {
   clients: Client[];
@@ -48,6 +48,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [protocolText, setProtocolText] = useState(() => generateProtocolText("", "", ""));
   const [products, setProducts] = useState<Product[]>([]);
   const [newProduct, setNewProduct] = useState({ name: "", quantity: "" as string | number, unit: "", price: "" as string | number });
+  const [city, setCity] = useState("");
+  const [assignorEik, setAssignorEik] = useState("");
+  const [assignorAddress, setAssignorAddress] = useState("");
+  const [executorEik, setExecutorEik] = useState("");
+  const [executorAddress, setExecutorAddress] = useState("");
+  const [paymentTerms, setPaymentTerms] = useState("");
+  const [bankAccount, setBankAccount] = useState("");
+  const [warrantyMonths, setWarrantyMonths] = useState("");
+  const [penaltyPercent, setPenaltyPercent] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
 
@@ -56,6 +65,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       setAssignor(selectedClient.name);
       setSignFor(selectedClient.contactPerson || "");
       setClientSearch(selectedClient.name);
+      setAssignorAddress(selectedClient.address || "");
     }
   }, [selectedClient, editingDocument]);
 
@@ -98,6 +108,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       setSignBy(migrate(v.signBy));
       setProtocolText(migrate(v.protocolText));
       setProducts(v.products.map(p => ({ ...p })));
+      setCity(v.city || "");
+      setAssignorEik(v.assignorEik || "");
+      setAssignorAddress(v.assignorAddress || "");
+      setExecutorEik(v.executorEik || "");
+      setExecutorAddress(v.executorAddress || "");
+      setPaymentTerms(v.paymentTerms || "");
+      setBankAccount(v.bankAccount || "");
+      setWarrantyMonths(v.warrantyMonths || "");
+      setPenaltyPercent(v.penaltyPercent || "");
     }
   }, [editingDocument]);
 
@@ -160,6 +179,8 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const getVersionData = () => ({
     docType, docNumber, assignor, executor, object,
     startDate, endDate, signFor, signBy, protocolText, products,
+    city, assignorEik, assignorAddress, executorEik, executorAddress,
+    paymentTerms, bankAccount, warrantyMonths, penaltyPercent,
   });
 
   const handleExport = () => {
@@ -188,6 +209,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setSignBy("Александър Караманов");
     setProtocolText(generateProtocolText("", selectedClient?.contactPerson || "", ""));
     setProducts([]);
+    setCity("");
+    setAssignorEik("");
+    setAssignorAddress(selectedClient?.address || "");
+    setExecutorEik("");
+    setExecutorAddress("");
+    setPaymentTerms("");
+    setBankAccount("");
+    setWarrantyMonths("");
+    setPenaltyPercent("");
     onClearEdit();
   };
 
@@ -242,7 +272,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
         await saveDocument({
           id: crypto.randomUUID(),
           clientId: currentClient.id,
-          title: `${docType === "protocol" ? "Протокол" : "Оферта"}${docNumber ? ` ${docNumber}` : ""}`,
+          title: `${docTypeLabel(docType)}${docNumber ? ` ${docNumber}` : ""}`,
           versions: [{ ...versionData, version: 1, savedAt: now }],
           createdAt: now,
           updatedAt: now,
@@ -355,26 +385,27 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
             <h2 className="text-[15px] font-semibold text-foreground">Данни за документа</h2>
           </div>
           <CardContent className="space-y-4 px-5 pb-5">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-muted-foreground">Тип документ</Label>
-                <div className="flex h-12 rounded-xl bg-muted/40 p-1 gap-1">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-medium text-muted-foreground">Тип документ</Label>
+              <div className="grid grid-cols-3 h-12 rounded-xl bg-muted/40 p-1 gap-1">
+                {[
+                  { value: "protocol", label: "Протокол" },
+                  { value: "offer", label: "Оферта" },
+                  { value: "contract", label: "Договор" },
+                ].map((t) => (
                   <button
+                    key={t.value}
                     type="button"
-                    className={`flex-1 rounded-lg text-sm font-medium transition-all ${docType === "protocol" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                    onClick={() => setDocType("protocol")}
+                    className={`rounded-lg text-sm font-medium transition-all ${docType === t.value ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                    onClick={() => setDocType(t.value)}
                   >
-                    Протокол
+                    {t.label}
                   </button>
-                  <button
-                    type="button"
-                    className={`flex-1 rounded-lg text-sm font-medium transition-all ${docType === "offer" ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                    onClick={() => setDocType("offer")}
-                  >
-                    Оферта
-                  </button>
-                </div>
+                ))}
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">Номер <span className="text-destructive">*</span></Label>
                 <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Напр. 1.2.3.4" value={docNumber} onChange={(e) => setDocNumber(e.target.value)} />
@@ -518,14 +549,14 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Описание на обекта" value={object} onChange={(e) => setObject(e.target.value)} />
             </div>
 
-            {docType === "protocol" ? (
+            {docType !== "offer" ? (
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Начало</Label>
+                  <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />{docType === "contract" ? "Дата на договора" : "Начало"}</Label>
                   <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Завършване</Label>
+                  <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />{docType === "contract" ? "Срок за изпълнение" : "Завършване"}</Label>
                   <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
                 </div>
               </div>
@@ -533,6 +564,52 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground flex items-center gap-1"><Calendar className="h-3 w-3" />Дата на офертата</Label>
                 <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              </div>
+            )}
+
+            {docType === "contract" && (
+              <div className="space-y-4 p-4 rounded-2xl bg-accent/40 border border-dashed border-primary/20">
+                <p className="text-xs font-semibold text-foreground">Данни за договора</p>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground">Град на сключване</Label>
+                  <Input className="h-12 rounded-xl bg-card border-transparent" placeholder="Напр. София" value={city} onChange={(e) => setCity(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">ЕИК / ЕГН Възложител</Label>
+                    <Input className="h-12 rounded-xl bg-card border-transparent" value={assignorEik} onChange={(e) => setAssignorEik(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">ЕИК / ЕГН Изпълнител</Label>
+                    <Input className="h-12 rounded-xl bg-card border-transparent" value={executorEik} onChange={(e) => setExecutorEik(e.target.value)} />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground">Адрес на Възложителя</Label>
+                  <Input className="h-12 rounded-xl bg-card border-transparent" value={assignorAddress} onChange={(e) => setAssignorAddress(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground">Адрес на Изпълнителя</Label>
+                  <Input className="h-12 rounded-xl bg-card border-transparent" value={executorAddress} onChange={(e) => setExecutorAddress(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground">Условия на плащане</Label>
+                  <Textarea rows={3} className="resize-y text-sm rounded-xl bg-card border-transparent" placeholder="Напр. 50% авансово, 50% след приемане" value={paymentTerms} onChange={(e) => setPaymentTerms(e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-muted-foreground">Банкова сметка (IBAN)</Label>
+                  <Input className="h-12 rounded-xl bg-card border-transparent" placeholder="BG.." value={bankAccount} onChange={(e) => setBankAccount(e.target.value)} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">Гаранция (месеци)</Label>
+                    <Input className="h-12 rounded-xl bg-card border-transparent" type="number" min={0} value={warrantyMonths} onChange={(e) => setWarrantyMonths(e.target.value)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium text-muted-foreground">Неустойка (% на ден)</Label>
+                    <Input className="h-12 rounded-xl bg-card border-transparent" type="number" min={0} step={0.1} value={penaltyPercent} onChange={(e) => setPenaltyPercent(e.target.value)} />
+                  </div>
+                </div>
               </div>
             )}
 
