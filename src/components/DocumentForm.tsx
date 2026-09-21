@@ -65,6 +65,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       setAssignor(selectedClient.name);
       setSignFor(selectedClient.contactPerson || "");
       setClientSearch(selectedClient.name);
+      setAssignorAddress(selectedClient.address || "");
     }
   }, [selectedClient, editingDocument]);
 
@@ -107,6 +108,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       setSignBy(migrate(v.signBy));
       setProtocolText(migrate(v.protocolText));
       setProducts(v.products.map(p => ({ ...p })));
+      setCity(v.city || "");
+      setAssignorEik(v.assignorEik || "");
+      setAssignorAddress(v.assignorAddress || "");
+      setExecutorEik(v.executorEik || "");
+      setExecutorAddress(v.executorAddress || "");
+      setPaymentTerms(v.paymentTerms || "");
+      setBankAccount(v.bankAccount || "");
+      setWarrantyMonths(v.warrantyMonths || "");
+      setPenaltyPercent(v.penaltyPercent || "");
     }
   }, [editingDocument]);
 
@@ -169,6 +179,8 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const getVersionData = () => ({
     docType, docNumber, assignor, executor, object,
     startDate, endDate, signFor, signBy, protocolText, products,
+    city, assignorEik, assignorAddress, executorEik, executorAddress,
+    paymentTerms, bankAccount, warrantyMonths, penaltyPercent,
   });
 
   const handleExport = () => {
@@ -197,6 +209,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setSignBy("Александър Караманов");
     setProtocolText(generateProtocolText("", selectedClient?.contactPerson || "", ""));
     setProducts([]);
+    setCity("");
+    setAssignorEik("");
+    setAssignorAddress(selectedClient?.address || "");
+    setExecutorEik("");
+    setExecutorAddress("");
+    setPaymentTerms("");
+    setBankAccount("");
+    setWarrantyMonths("");
+    setPenaltyPercent("");
     onClearEdit();
   };
 
