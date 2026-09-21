@@ -137,6 +137,7 @@ export function SavedDocuments({ documents, onDocumentsChange, onEditDocument }:
               <SelectItem value="all">Всички</SelectItem>
               <SelectItem value="protocol">Протокол</SelectItem>
               <SelectItem value="offer">Оферта</SelectItem>
+              <SelectItem value="contract">Договор</SelectItem>
             </SelectContent>
           </Select>
         </div>
