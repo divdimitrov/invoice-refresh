@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { exportPDF, type PdfResult } from "@/lib/pdf-export";
 import { PdfPreviewDialog } from "@/components/PdfPreviewDialog";
 import { type Client, type Product, type SavedDocument, saveDocument, addVersionToDocument, docTypeLabel } from "@/lib/storage";
+import ContractSheet from "@/components/ContractSheet";
+
 
 interface DocumentFormProps {
   clients: Client[];
