@@ -9,12 +9,15 @@ import { ChangePinDialog } from "@/components/ChangePinDialog";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
+
 const queryClient = new QueryClient();
 
 function AuthGate() {
   const { authenticated, mustChange } = useAuth();
 
+
   if (!authenticated) return <PinLogin />;
+
 
   return (
     <>
