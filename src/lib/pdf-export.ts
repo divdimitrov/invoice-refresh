@@ -25,6 +25,15 @@ interface DocumentData {
   signBy: string;
   protocolText: string;
   products: Product[];
+  city?: string;
+  assignorEik?: string;
+  assignorAddress?: string;
+  executorEik?: string;
+  executorAddress?: string;
+  paymentTerms?: string;
+  bankAccount?: string;
+  warrantyMonths?: string;
+  penaltyPercent?: string;
 }
 
 // Color palette
@@ -52,6 +61,7 @@ function color(doc: jsPDF, c: readonly [number, number, number]) {
 }
 
 export function exportPDF(data: DocumentData) {
+  if (data.docType === "contract") return exportContractPDF(data);
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   setupFonts(doc);
 
