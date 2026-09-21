@@ -32,6 +32,22 @@ export interface DocumentVersion {
   signBy: string;
   protocolText: string;
   products: Product[];
+  // Договор за СМР (по избор)
+  city?: string;
+  assignorEik?: string;
+  assignorAddress?: string;
+  executorEik?: string;
+  executorAddress?: string;
+  paymentTerms?: string;
+  bankAccount?: string;
+  warrantyMonths?: string;
+  penaltyPercent?: string;
+}
+
+export function docTypeLabel(docType: string) {
+  if (docType === "protocol") return "Протокол";
+  if (docType === "contract") return "Договор";
+  return "Оферта";
 }
 
 export interface SavedDocument {
