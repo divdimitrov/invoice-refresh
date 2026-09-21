@@ -625,9 +625,37 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
                 <Textarea rows={8} value={protocolText} onChange={(e) => setProtocolText(e.target.value)} className="resize-y text-sm rounded-xl bg-muted/40 border-transparent focus:border-primary/30 min-h-[120px]" />
               </div>
             )}
+            </>
+            )}
           </CardContent>
         </Card>
       </motion.div>
+
+      {docType === "contract" && (
+        <ContractSheet
+          docNumber={docNumber} setDocNumber={setDocNumber}
+          city={city} setCity={setCity}
+          startDate={startDate} setStartDate={setStartDate}
+          endDate={endDate} setEndDate={setEndDate}
+          assignor={assignor} setAssignor={setAssignor}
+          assignorEik={assignorEik} setAssignorEik={setAssignorEik}
+          assignorAddress={assignorAddress} setAssignorAddress={setAssignorAddress}
+          executor={executor} setExecutor={setExecutor}
+          executorEik={executorEik} setExecutorEik={setExecutorEik}
+          executorAddress={executorAddress} setExecutorAddress={setExecutorAddress}
+          signFor={signFor} setSignFor={setSignFor}
+          signBy={signBy} setSignBy={setSignBy}
+          object={object} setObject={setObject}
+          contractPrice={contractPrice} setContractPrice={setContractPrice}
+          paymentTerms={paymentTerms} setPaymentTerms={setPaymentTerms}
+          bankAccount={bankAccount} setBankAccount={setBankAccount}
+          warrantyMonths={warrantyMonths} setWarrantyMonths={setWarrantyMonths}
+          penaltyPercent={penaltyPercent} setPenaltyPercent={setPenaltyPercent}
+          executorOptions={["Караманов Груп ЕООД", "Александър Строй ЕООД"]}
+          repOptions={selectedClient?.representatives || []}
+        />
+      )}
+
 
       {/* Products */}
       {docType !== "contract" && (
