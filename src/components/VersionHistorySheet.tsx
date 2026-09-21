@@ -1,4 +1,4 @@
-import { SavedDocument } from "@/lib/storage";
+import { SavedDocument, docTypeLabel } from "@/lib/storage";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -93,7 +93,7 @@ export function VersionHistorySheet({ open, onClose, document, onExportVersion, 
                       <span className="text-xs text-muted-foreground">{formatTime(v.savedAt)}</span>
                       <span className="text-xs text-muted-foreground">•</span>
                       <span className="text-xs text-muted-foreground">
-                        {v.docType === "protocol" ? "Протокол" : "Оферта"} {v.docNumber}
+                        {docTypeLabel(v.docType)} {v.docNumber}
                       </span>
                     </div>
                   </div>
