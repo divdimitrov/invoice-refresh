@@ -131,6 +131,7 @@ function mapVersion(row: DbVersionRow): DocumentVersion {
     bankAccount: data.bankAccount || "",
     warrantyMonths: data.warrantyMonths || "",
     penaltyPercent: data.penaltyPercent || "",
+    contractPrice: data.contractPrice || "",
   };
 }
 
@@ -160,6 +161,7 @@ function versionDataPayload(v: Omit<DocumentVersion, "version" | "savedAt">) {
     bankAccount: v.bankAccount ?? "",
     warrantyMonths: v.warrantyMonths ?? "",
     penaltyPercent: v.penaltyPercent ?? "",
+    contractPrice: v.contractPrice ?? "",
   };
 }
 

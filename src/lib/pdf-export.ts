@@ -34,6 +34,7 @@ interface DocumentData {
   bankAccount?: string;
   warrantyMonths?: string;
   penaltyPercent?: string;
+  contractPrice?: string;
 }
 
 // Color palette
