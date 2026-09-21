@@ -57,6 +57,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [bankAccount, setBankAccount] = useState("");
   const [warrantyMonths, setWarrantyMonths] = useState("");
   const [penaltyPercent, setPenaltyPercent] = useState("");
+  const [contractPrice, setContractPrice] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
 
@@ -117,6 +118,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       setBankAccount(v.bankAccount || "");
       setWarrantyMonths(v.warrantyMonths || "");
       setPenaltyPercent(v.penaltyPercent || "");
+      setContractPrice(v.contractPrice || "");
     }
   }, [editingDocument]);
 
@@ -180,7 +182,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     docType, docNumber, assignor, executor, object,
     startDate, endDate, signFor, signBy, protocolText, products,
     city, assignorEik, assignorAddress, executorEik, executorAddress,
-    paymentTerms, bankAccount, warrantyMonths, penaltyPercent,
+    paymentTerms, bankAccount, warrantyMonths, penaltyPercent, contractPrice,
   });
 
   const handleExport = () => {
