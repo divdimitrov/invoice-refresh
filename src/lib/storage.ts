@@ -42,6 +42,7 @@ export interface DocumentVersion {
   bankAccount?: string;
   warrantyMonths?: string;
   penaltyPercent?: string;
+  contractPrice?: string;
 }
 
 export function docTypeLabel(docType: string) {

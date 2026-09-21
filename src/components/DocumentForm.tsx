@@ -220,6 +220,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setBankAccount("");
     setWarrantyMonths("");
     setPenaltyPercent("");
+    setContractPrice("");
     onClearEdit();
   };
 
