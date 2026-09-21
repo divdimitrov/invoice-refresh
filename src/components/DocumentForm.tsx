@@ -530,8 +530,8 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               </AnimatePresence>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
             {docType !== "contract" && (
+
             <>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
