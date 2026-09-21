@@ -408,12 +408,15 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
               </div>
             </div>
 
+            {docType !== "contract" && (
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
                 <Label className="text-xs font-medium text-muted-foreground">Номер <span className="text-destructive">*</span></Label>
                 <Input className="h-12 rounded-xl bg-muted/40 border-transparent focus:border-primary/30" placeholder="Напр. 1.2.3.4" value={docNumber} onChange={(e) => setDocNumber(e.target.value)} />
               </div>
             </div>
+            )}
+
 
             {/* Client Picker */}
             <div className="space-y-1.5" ref={clientSearchRef}>
