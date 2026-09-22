@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { InlineField, InlineSelect, InlineArea, Article, ContractHeading } from "./ContractEditor";
+import { InlineField, InlineSelect, InlineCombo, InlineArea, Article, ContractHeading } from "./ContractEditor";
 
 export interface ContractSheetProps {
   docNumber: string; setDocNumber: (v: string) => void;
@@ -60,11 +60,7 @@ export default function ContractSheet(p: ContractSheetProps) {
 
             <InlineField value={p.assignorAddress} onChange={p.setAssignorAddress} placeholder="адрес" min={20} />, ЕИК (ЕГН):{" "}
             <InlineField value={p.assignorEik} onChange={p.setAssignorEik} placeholder="123456789" min={10} />, представлявано от{" "}
-            {p.repOptions.length > 0 ? (
-              <InlineSelect value={p.signFor} onChange={p.setSignFor} options={p.repOptions} placeholder="представител" />
-            ) : (
-              <InlineField value={p.signFor} onChange={p.setSignFor} placeholder="представител" min={14} />
-            )}
+            <InlineCombo value={p.signFor} onChange={p.setSignFor} options={p.repOptions} placeholder="представител" />
             , наричано по-долу <b>ВЪЗЛОЖИТЕЛ</b>,
           </Article>
 
