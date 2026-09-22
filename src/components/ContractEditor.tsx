@@ -151,12 +151,16 @@ export function EditableClause({
   text,
   original,
   onChange,
+  autoEdit = false,
+  resetLabel = "Върни оригинала",
 }: {
   text: string;
   original: string;
   onChange: (v: string | null) => void;
+  autoEdit?: boolean;
+  resetLabel?: string;
 }) {
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(autoEdit);
   const changed = text !== original;
 
   if (editing) {
@@ -183,7 +187,7 @@ export function EditableClause({
               onClick={() => onChange(null)}
               className="text-muted-foreground underline underline-offset-2 hover:text-primary"
             >
-              Върни оригинала
+              {resetLabel}
             </button>
           )}
         </div>
@@ -212,7 +216,7 @@ export function EditableClause({
             onClick={() => onChange(null)}
             className="text-[11px] text-muted-foreground underline underline-offset-2 hover:text-primary"
           >
-            Върни оригинала
+            {resetLabel}
           </button>
         )}
       </div>
@@ -226,6 +230,58 @@ export function ContractHeading({ children }: { children: ReactNode }) {
       <span className="h-px flex-1 bg-gradient-to-r from-transparent to-primary/30" />
       <h3 className="text-center font-bold text-[12px] tracking-[0.12em] text-primary uppercase">{children}</h3>
       <span className="h-px flex-1 bg-gradient-to-l from-transparent to-primary/30" />
+    </div>
+  );
+}
+
+export function EditableWrap({
+  id,
+  plain,
+  override,
+  onChange,
+  children,
+}: {
+  id: string;
+  plain: string;
+  override?: string;
+  onChange: (v: string | null) => void;
+  children: ReactNode;
+}) {
+  const [opened, setOpened] = useState(false);
+
+  if (override !== undefined) {
+    return (
+      <EditableClause
+        key={id}
+        text={override}
+        original={plain}
+        autoEdit={opened}
+        resetLabel="Върни полетата"
+        onChange={(v) => {
+          if (v === null) setOpened(false);
+          onChange(v);
+        }}
+      />
+    );
+  }
+
+  return (
+    <div className="group relative my-1 rounded-lg px-2 py-1 transition-colors hover:bg-primary/[0.04]">
+      <Article>{children}</Article>
+      <div className="mt-0.5">
+        <button
+          type="button"
+          title="Промени текста на клаузата"
+          onClick={() => {
+            setOpened(true);
+            onChange(plain);
+          }}
+          className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/[0.07] px-2 py-0.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15"
+        >
+          <Pencil className="h-3 w-3" />
+          Промени текста
+        </button>
+      </div>
     </div>
   );
 }
