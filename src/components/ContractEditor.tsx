@@ -153,15 +153,25 @@ export function EditableClause({
   onChange,
   autoEdit = false,
   resetLabel = "Върни оригинала",
+  unlocked = false,
 }: {
   text: string;
   original: string;
   onChange: (v: string | null) => void;
   autoEdit?: boolean;
   resetLabel?: string;
+  unlocked?: boolean;
 }) {
   const [editing, setEditing] = useState(autoEdit);
   const changed = text !== original;
+
+  if (!unlocked) {
+    return (
+      <p className="leading-[2.3] text-justify px-2 py-1">
+        <span className={changed ? "bg-primary/[0.07] rounded px-0.5" : undefined}>{text}</span>
+      </p>
+    );
+  }
 
   if (editing) {
     return (
@@ -224,6 +234,7 @@ export function EditableClause({
   );
 }
 
+
 export function ContractHeading({ children }: { children: ReactNode }) {
   return (
     <div className="pt-6 pb-1 flex items-center gap-3">
@@ -240,12 +251,14 @@ export function EditableWrap({
   override,
   onChange,
   children,
+  unlocked = false,
 }: {
   id: string;
   plain: string;
   override?: string;
   onChange: (v: string | null) => void;
   children: ReactNode;
+  unlocked?: boolean;
 }) {
   const [opened, setOpened] = useState(false);
 
@@ -255,7 +268,8 @@ export function EditableWrap({
         key={id}
         text={override}
         original={plain}
-        autoEdit={opened}
+        autoEdit={opened && unlocked}
+        unlocked={unlocked}
         resetLabel="Върни полетата"
         onChange={(v) => {
           if (v === null) setOpened(false);
@@ -265,10 +279,13 @@ export function EditableWrap({
     );
   }
 
+  if (!unlocked) return <Article>{children}</Article>;
+
   return (
     <div className="group relative my-1 rounded-lg px-2 py-1 transition-colors hover:bg-primary/[0.04]">
       <Article>{children}</Article>
       <div className="mt-0.5">
+
         <button
           type="button"
           title="Промени текста на клаузата"
