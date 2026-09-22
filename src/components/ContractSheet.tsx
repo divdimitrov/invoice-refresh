@@ -199,16 +199,22 @@ export default function ContractSheet(p: ContractSheetProps) {
           </Article>
           <Article>Настоящият договор се състави в два еднообразни екземпляра — по един за всяка страна.</Article>
 
-          <div className="grid grid-cols-2 gap-6 pt-10 text-center">
-            <div className="space-y-2">
-              <p className="font-bold text-[12px]">ВЪЗЛОЖИТЕЛ:</p>
-              <div className="border-b border-border pt-6" />
-              <p className="text-primary text-[12px]">/ {p.signFor || "........................."} /</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-12 mt-6 border-t border-dashed border-border text-center">
+            <div className="space-y-2 rounded-xl bg-muted/40 px-4 py-5">
+              <p className="font-bold text-[11px] tracking-[0.1em] text-muted-foreground">ВЪЗЛОЖИТЕЛ</p>
+              {p.repOptions.length > 0 ? (
+                <InlineSelect value={p.signFor} onChange={p.setSignFor} options={p.repOptions} placeholder="представител" />
+              ) : (
+                <InlineField value={p.signFor} onChange={p.setSignFor} placeholder="представител" min={14} />
+              )}
+              <div className="border-b border-border pt-5" />
+              <p className="text-primary text-[12px] font-medium">/ {p.signFor || "........................."} /</p>
             </div>
-            <div className="space-y-2">
-              <p className="font-bold text-[12px]">ИЗПЪЛНИТЕЛ:</p>
-              <div className="border-b border-border pt-6" />
-              <p className="text-primary text-[12px]">/ {p.signBy || "........................."} /</p>
+            <div className="space-y-2 rounded-xl bg-muted/40 px-4 py-5">
+              <p className="font-bold text-[11px] tracking-[0.1em] text-muted-foreground">ИЗПЪЛНИТЕЛ</p>
+              <InlineField value={p.signBy} onChange={p.setSignBy} placeholder="представител" min={14} />
+              <div className="border-b border-border pt-5" />
+              <p className="text-primary text-[12px] font-medium">/ {p.signBy || "........................."} /</p>
             </div>
           </div>
         </div>
