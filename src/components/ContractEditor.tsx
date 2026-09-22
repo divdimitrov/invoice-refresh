@@ -13,6 +13,9 @@ function ch(value: string, placeholder: string, min: number) {
   return `${Math.min(len + 1, 70)}ch`;
 }
 
+const base =
+  "inline-block align-baseline bg-primary/[0.06] border-b border-dashed border-primary/40 px-1.5 py-0.5 rounded-md text-foreground font-medium outline-none transition-all duration-200 hover:bg-primary/10 focus:bg-primary/10 focus:border-solid focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-muted-foreground/50 placeholder:font-normal placeholder:italic";
+
 export function InlineField({ value, onChange, placeholder = ".........", min = 8, type = "text" }: InlineProps) {
   return (
     <input
@@ -21,7 +24,7 @@ export function InlineField({ value, onChange, placeholder = ".........", min = 
       placeholder={placeholder}
       onChange={(e) => onChange(e.target.value)}
       style={{ width: type === "date" ? "13ch" : ch(value, placeholder, min) }}
-      className="inline-block align-baseline bg-primary/5 border-b border-dashed border-primary/50 px-1 py-0.5 rounded-t-sm text-foreground font-medium outline-none focus:bg-primary/10 focus:border-primary transition-colors placeholder:text-muted-foreground/60 placeholder:font-normal"
+      className={base}
     />
   );
 }
@@ -42,7 +45,7 @@ export function InlineSelect({
     <select
       value={known ? value : ""}
       onChange={(e) => onChange(e.target.value)}
-      className="inline-block align-baseline bg-primary/5 border-b border-dashed border-primary/50 px-1 py-0.5 rounded-t-sm text-foreground font-medium outline-none focus:bg-primary/10 focus:border-primary transition-colors max-w-full"
+      className={`${base} max-w-full cursor-pointer appearance-none pr-5 bg-[length:10px] bg-no-repeat bg-[right_0.35rem_center] bg-[url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23888' stroke-width='1.6'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E")]`}
     >
       <option value="" disabled>
         {value && !known ? value : placeholder}
@@ -63,15 +66,21 @@ export function InlineArea({ value, onChange, placeholder = "........." }: Inlin
       placeholder={placeholder}
       rows={2}
       onChange={(e) => onChange(e.target.value)}
-      className="block w-full mt-1 resize-y bg-primary/5 border-b border-dashed border-primary/50 px-2 py-1 rounded-t-sm text-foreground font-medium outline-none focus:bg-primary/10 focus:border-primary transition-colors placeholder:text-muted-foreground/60 placeholder:font-normal"
+      className={`${base} block w-full mt-1.5 resize-y px-2.5 py-1.5`}
     />
   );
 }
 
 export function Article({ children }: { children: ReactNode }) {
-  return <p className="leading-[2.1] text-justify">{children}</p>;
+  return <p className="leading-[2.3] text-justify">{children}</p>;
 }
 
 export function ContractHeading({ children }: { children: ReactNode }) {
-  return <h3 className="text-center font-bold text-[13px] tracking-wide text-primary pt-3">{children}</h3>;
+  return (
+    <div className="pt-6 pb-1 flex items-center gap-3">
+      <span className="h-px flex-1 bg-gradient-to-r from-transparent to-primary/30" />
+      <h3 className="text-center font-bold text-[12px] tracking-[0.12em] text-primary uppercase">{children}</h3>
+      <span className="h-px flex-1 bg-gradient-to-l from-transparent to-primary/30" />
+    </div>
+  );
 }
