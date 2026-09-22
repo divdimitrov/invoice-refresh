@@ -43,6 +43,7 @@ export interface DocumentVersion {
   warrantyMonths?: string;
   penaltyPercent?: string;
   contractPrice?: string;
+  clauseOverrides?: Record<string, string>;
 }
 
 export function docTypeLabel(docType: string) {
@@ -132,6 +133,7 @@ function mapVersion(row: DbVersionRow): DocumentVersion {
     warrantyMonths: data.warrantyMonths || "",
     penaltyPercent: data.penaltyPercent || "",
     contractPrice: data.contractPrice || "",
+    clauseOverrides: data.clauseOverrides || {},
   };
 }
 
@@ -162,6 +164,7 @@ function versionDataPayload(v: Omit<DocumentVersion, "version" | "savedAt">) {
     warrantyMonths: v.warrantyMonths ?? "",
     penaltyPercent: v.penaltyPercent ?? "",
     contractPrice: v.contractPrice ?? "",
+    clauseOverrides: v.clauseOverrides ?? {},
   };
 }
 

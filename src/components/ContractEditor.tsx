@@ -146,6 +146,65 @@ export function Article({ children }: { children: ReactNode }) {
   return <p className="leading-[2.3] text-justify">{children}</p>;
 }
 
+export function EditableClause({
+  text,
+  original,
+  onChange,
+}: {
+  text: string;
+  original: string;
+  onChange: (v: string | null) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const changed = text !== original;
+
+  if (editing) {
+    return (
+      <div className="my-1 rounded-lg border border-primary/40 bg-primary/[0.04] p-2.5">
+        <textarea
+          value={text}
+          autoFocus
+          rows={Math.max(3, Math.ceil(text.length / 90))}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full resize-y rounded-md bg-background/70 p-2 text-[13px] leading-[1.7] text-foreground outline-none ring-1 ring-border focus:ring-2 focus:ring-primary/40"
+        />
+        <div className="mt-2 flex items-center gap-3 text-[11px]">
+          <button
+            type="button"
+            onClick={() => setEditing(false)}
+            className="rounded-md bg-primary px-2.5 py-1 font-medium text-primary-foreground"
+          >
+            Готово
+          </button>
+          {changed && (
+            <button
+              type="button"
+              onClick={() => onChange(null)}
+              className="text-muted-foreground underline underline-offset-2 hover:text-primary"
+            >
+              Върни оригинала
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <p className="group relative leading-[2.3] text-justify">
+      <span className={changed ? "bg-primary/[0.05] rounded px-0.5" : undefined}>{text}</span>{" "}
+      <button
+        type="button"
+        title="Промени клаузата"
+        onClick={() => setEditing(true)}
+        className="align-baseline text-[10px] text-muted-foreground/60 underline underline-offset-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 hover:text-primary"
+      >
+        промени
+      </button>
+    </p>
+  );
+}
+
 export function ContractHeading({ children }: { children: ReactNode }) {
   return (
     <div className="pt-6 pb-1 flex items-center gap-3">

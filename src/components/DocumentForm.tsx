@@ -60,6 +60,14 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
   const [warrantyMonths, setWarrantyMonths] = useState("");
   const [penaltyPercent, setPenaltyPercent] = useState("");
   const [contractPrice, setContractPrice] = useState("");
+  const [clauseOverrides, setClauseOverrides] = useState<Record<string, string>>({});
+  const setClauseOverride = (id: string, v: string | null) =>
+    setClauseOverrides((prev) => {
+      const next = { ...prev };
+      if (v === null) delete next[id];
+      else next[id] = v;
+      return next;
+    });
   const [isSaving, setIsSaving] = useState(false);
   const [pdfPreview, setPdfPreview] = useState<PdfResult | null>(null);
 
@@ -121,6 +129,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
       setWarrantyMonths(v.warrantyMonths || "");
       setPenaltyPercent(v.penaltyPercent || "");
       setContractPrice(v.contractPrice || "");
+      setClauseOverrides(v.clauseOverrides || {});
     }
   }, [editingDocument]);
 
@@ -185,6 +194,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     startDate, endDate, signFor, signBy, protocolText, products,
     city, assignorEik, assignorAddress, executorEik, executorAddress,
     paymentTerms, bankAccount, warrantyMonths, penaltyPercent, contractPrice,
+    clauseOverrides,
   });
 
   const handleExport = () => {
@@ -223,6 +233,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
     setWarrantyMonths("");
     setPenaltyPercent("");
     setContractPrice("");
+    setClauseOverrides({});
     onClearEdit();
   };
 
@@ -653,6 +664,7 @@ export function DocumentForm({ clients, selectedClient, editingDocument, onClear
           bankAccount={bankAccount} setBankAccount={setBankAccount}
           warrantyMonths={warrantyMonths} setWarrantyMonths={setWarrantyMonths}
           penaltyPercent={penaltyPercent} setPenaltyPercent={setPenaltyPercent}
+          clauseOverrides={clauseOverrides} setClauseOverride={setClauseOverride}
           executorOptions={["Караманов Груп ЕООД", "Александър Строй ЕООД"]}
           repOptions={selectedClient?.representatives || []}
         />
