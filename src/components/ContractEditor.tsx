@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 
 interface InlineProps {
   value: string;
@@ -55,6 +55,77 @@ export function InlineSelect({
           {o}
         </option>
       ))}
+    </select>
+  );
+}
+
+const OTHER = "__other__";
+
+export function InlineCombo({
+  value,
+  onChange,
+  options,
+  placeholder = ".........",
+  min = 14,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: string[];
+  placeholder?: string;
+  min?: number;
+}) {
+  const known = options.includes(value);
+  const [custom, setCustom] = useState(!known && value !== "");
+
+  if (custom) {
+    return (
+      <span className="inline-flex items-center gap-1 align-baseline">
+        <input
+          type="text"
+          value={value}
+          placeholder={placeholder}
+          autoFocus
+          onChange={(e) => onChange(e.target.value)}
+          style={{ width: ch(value, placeholder, min) }}
+          className={base}
+        />
+        {options.length > 0 && (
+          <button
+            type="button"
+            title="Избери от списъка"
+            onClick={() => {
+              setCustom(false);
+              onChange("");
+            }}
+            className="text-[10px] text-muted-foreground hover:text-primary underline underline-offset-2"
+          >
+            списък
+          </button>
+        )}
+      </span>
+    );
+  }
+
+  return (
+    <select
+      value={known ? value : ""}
+      onChange={(e) => {
+        if (e.target.value === OTHER) {
+          setCustom(true);
+          onChange("");
+        } else onChange(e.target.value);
+      }}
+      className={`${base} max-w-full cursor-pointer appearance-none pr-5 bg-[length:10px] bg-no-repeat bg-[right_0.35rem_center] bg-[url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' fill='none' stroke='%23888' stroke-width='1.6'%3E%3Cpath d='M1 1l5 5 5-5'/%3E%3C/svg%3E")]`}
+    >
+      <option value="" disabled>
+        {placeholder}
+      </option>
+      {options.map((o) => (
+        <option key={o} value={o}>
+          {o}
+        </option>
+      ))}
+      <option value={OTHER}>Друг…</option>
     </select>
   );
 }
