@@ -8,7 +8,6 @@ import { PinLogin } from "@/components/PinLogin";
 import { ChangePinDialog } from "@/components/ChangePinDialog";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import TmpContractPreview from "./pages/TmpContractPreview.tsx";
 
 
 const queryClient = new QueryClient();
@@ -17,7 +16,6 @@ function AuthGate() {
   const { authenticated, mustChange } = useAuth();
 
 
-  if (window.location.pathname === "/__cs") return <TmpContractPreview />;
   if (!authenticated) return <PinLogin />;
 
 
