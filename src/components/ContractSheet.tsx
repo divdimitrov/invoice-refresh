@@ -63,11 +63,13 @@ export default function ContractSheet(p: ContractSheetProps) {
       id={id}
       plain={plain}
       override={p.clauseOverrides[id]}
+      unlocked={unlocked}
       onChange={(v) => p.setClauseOverride(id, v)}
     >
       {children}
     </EditableWrap>
   );
+
   const pct = () => (p.penaltyPercent ? `${p.penaltyPercent}%` : "....%");
 
   const penalty = () => <InlineField value={p.penaltyPercent} onChange={p.setPenaltyPercent} placeholder="0.5" min={3} />;
