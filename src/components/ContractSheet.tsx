@@ -1,7 +1,14 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { Lock, LockOpen } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { InlineField, InlineSelect, InlineCombo, InlineArea, Article, ContractHeading, EditableClause, EditableWrap } from "./ContractEditor";
 import { CLAUSES, clauseText } from "@/lib/contract-clauses";
+
 
 export interface ContractSheetProps {
   docNumber: string; setDocNumber: (v: string) => void;
