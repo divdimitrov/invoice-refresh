@@ -50,7 +50,13 @@ export default function ContractSheet(p: ContractSheetProps) {
           </Article>
 
           <Article>
-            1. <InlineField value={p.assignor} onChange={p.setAssignor} placeholder="Възложител" min={16} />, със седалище и адрес на управление:{" "}
+            1.{" "}
+            {p.assignorOptions && p.assignorOptions.length > 0 ? (
+              <InlineSelect value={p.assignor} onChange={p.setAssignor} options={p.assignorOptions} placeholder="Възложител" />
+            ) : (
+              <InlineField value={p.assignor} onChange={p.setAssignor} placeholder="Възложител" min={16} />
+            )}
+            , със седалище и адрес на управление:{" "}
 
             <InlineField value={p.assignorAddress} onChange={p.setAssignorAddress} placeholder="адрес" min={20} />, ЕИК (ЕГН):{" "}
             <InlineField value={p.assignorEik} onChange={p.setAssignorEik} placeholder="123456789" min={10} />, представлявано от{" "}
