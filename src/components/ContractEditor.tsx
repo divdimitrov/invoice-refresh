@@ -197,7 +197,7 @@ export function EditableClause({
         type="button"
         title="Промени клаузата"
         onClick={() => setEditing(true)}
-        className="align-baseline text-[10px] text-muted-foreground/60 underline underline-offset-2 opacity-0 transition-opacity group-hover:opacity-100 focus:opacity-100 hover:text-primary"
+        className="align-baseline text-[10px] text-muted-foreground/60 underline underline-offset-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 hover:text-primary"
       >
         промени
       </button>
