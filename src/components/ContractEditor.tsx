@@ -147,93 +147,44 @@ export function Article({ children }: { children: ReactNode }) {
   return <p className="leading-[2.3] text-justify">{children}</p>;
 }
 
+function ClauseArea({
+  text,
+  original,
+  onChange,
+}: {
+  text: string;
+  original: string;
+  onChange: (v: string | null) => void;
+}) {
+  return (
+    <textarea
+      value={text}
+      rows={Math.max(2, Math.ceil(text.length / 95))}
+      onChange={(e) => onChange(e.target.value === original ? null : e.target.value)}
+      className="my-1 block w-full resize-y rounded-lg border border-primary/25 bg-primary/[0.03] p-2.5 text-[13px] leading-[1.9] text-foreground outline-none transition-colors focus:border-primary focus:bg-primary/[0.06] focus:ring-2 focus:ring-primary/20"
+    />
+  );
+}
+
 export function EditableClause({
   text,
   original,
   onChange,
-  autoEdit = false,
-  resetLabel = "Върни оригинала",
   unlocked = false,
 }: {
   text: string;
   original: string;
   onChange: (v: string | null) => void;
-  autoEdit?: boolean;
-  resetLabel?: string;
   unlocked?: boolean;
 }) {
-  const [editing, setEditing] = useState(autoEdit);
-  const changed = text !== original;
-
-  if (!unlocked) {
-    return (
-      <p className="leading-[2.3] text-justify px-2 py-1">
-        <span className={changed ? "bg-primary/[0.07] rounded px-0.5" : undefined}>{text}</span>
-      </p>
-    );
-  }
-
-  if (editing) {
-    return (
-      <div className="my-1 rounded-lg border border-primary/40 bg-primary/[0.04] p-2.5">
-        <textarea
-          value={text}
-          autoFocus
-          rows={Math.max(3, Math.ceil(text.length / 90))}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full resize-y rounded-md bg-background/70 p-2 text-[13px] leading-[1.7] text-foreground outline-none ring-1 ring-border focus:ring-2 focus:ring-primary/40"
-        />
-        <div className="mt-2 flex items-center gap-3 text-[11px]">
-          <button
-            type="button"
-            onClick={() => setEditing(false)}
-            className="rounded-md bg-primary px-2.5 py-1 font-medium text-primary-foreground"
-          >
-            Готово
-          </button>
-          {changed && (
-            <button
-              type="button"
-              onClick={() => onChange(null)}
-              className="text-muted-foreground underline underline-offset-2 hover:text-primary"
-            >
-              {resetLabel}
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  }
+  if (unlocked) return <ClauseArea text={text} original={original} onChange={onChange} />;
 
   return (
-    <div className="group relative my-1 rounded-lg px-2 py-1 transition-colors hover:bg-primary/[0.04]">
-      <p className="leading-[2.3] text-justify">
-        <span className={changed ? "bg-primary/[0.07] rounded px-0.5" : undefined}>{text}</span>
-      </p>
-      <div className="mt-0.5 flex items-center gap-2">
-        <button
-          type="button"
-          title="Промени клаузата"
-          onClick={() => setEditing(true)}
-          className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/[0.07] px-2 py-0.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15"
-        >
-          <Pencil className="h-3 w-3" />
-          Промени текста
-        </button>
-        {changed && (
-          <button
-            type="button"
-            onClick={() => onChange(null)}
-            className="text-[11px] text-muted-foreground underline underline-offset-2 hover:text-primary"
-          >
-            {resetLabel}
-          </button>
-        )}
-      </div>
-    </div>
+    <p className="leading-[2.3] text-justify px-2 py-1">
+      <span className={text !== original ? "bg-primary/[0.07] rounded px-0.5" : undefined}>{text}</span>
+    </p>
   );
 }
-
 
 export function ContractHeading({ children }: { children: ReactNode }) {
   return (
@@ -246,59 +197,31 @@ export function ContractHeading({ children }: { children: ReactNode }) {
 }
 
 export function EditableWrap({
-  id,
   plain,
   override,
   onChange,
   children,
   unlocked = false,
 }: {
-  id: string;
+  id?: string;
   plain: string;
   override?: string;
   onChange: (v: string | null) => void;
   children: ReactNode;
   unlocked?: boolean;
 }) {
-  const [opened, setOpened] = useState(false);
+  if (unlocked) return <ClauseArea text={override ?? plain} original={plain} onChange={onChange} />;
 
-  if (override !== undefined) {
+  if (override !== undefined && override !== plain) {
     return (
-      <EditableClause
-        key={id}
-        text={override}
-        original={plain}
-        autoEdit={opened && unlocked}
-        unlocked={unlocked}
-        resetLabel="Върни полетата"
-        onChange={(v) => {
-          if (v === null) setOpened(false);
-          onChange(v);
-        }}
-      />
+      <p className="leading-[2.3] text-justify px-2 py-1">
+        <span className="bg-primary/[0.07] rounded px-0.5">{override}</span>
+      </p>
     );
   }
 
-  if (!unlocked) return <Article>{children}</Article>;
+  return <Article>{children}</Article>;
+}
 
-  return (
-    <div className="group relative my-1 rounded-lg px-2 py-1 transition-colors hover:bg-primary/[0.04]">
-      <Article>{children}</Article>
-      <div className="mt-0.5">
-
-        <button
-          type="button"
-          title="Промени текста на клаузата"
-          onClick={() => {
-            setOpened(true);
-            onChange(plain);
-          }}
-          className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/[0.07] px-2 py-0.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15"
-        >
-          <Pencil className="h-3 w-3" />
-          Промени текста
-        </button>
-      </div>
-    </div>
   );
 }
