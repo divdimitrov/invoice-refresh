@@ -222,6 +222,3 @@ export function EditableWrap({
 
   return <Article>{children}</Article>;
 }
-
-  );
-}
