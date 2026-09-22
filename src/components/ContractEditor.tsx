@@ -153,15 +153,25 @@ export function EditableClause({
   onChange,
   autoEdit = false,
   resetLabel = "Върни оригинала",
+  unlocked = false,
 }: {
   text: string;
   original: string;
   onChange: (v: string | null) => void;
   autoEdit?: boolean;
   resetLabel?: string;
+  unlocked?: boolean;
 }) {
   const [editing, setEditing] = useState(autoEdit);
   const changed = text !== original;
+
+  if (!unlocked) {
+    return (
+      <p className="leading-[2.3] text-justify px-2 py-1">
+        <span className={changed ? "bg-primary/[0.07] rounded px-0.5" : undefined}>{text}</span>
+      </p>
+    );
+  }
 
   if (editing) {
     return (
@@ -223,6 +233,7 @@ export function EditableClause({
     </div>
   );
 }
+
 
 export function ContractHeading({ children }: { children: ReactNode }) {
   return (
