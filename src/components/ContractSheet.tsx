@@ -27,19 +27,22 @@ export interface ContractSheetProps {
 }
 
 export default function ContractSheet(p: ContractSheetProps) {
-  const penalty = <InlineField value={p.penaltyPercent} onChange={p.setPenaltyPercent} placeholder="0.5" min={3} />;
+  const penalty = () => <InlineField value={p.penaltyPercent} onChange={p.setPenaltyPercent} placeholder="0.5" min={3} />;
 
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}>
-      <Card className="card-elevated overflow-hidden">
-        <div className="px-4 sm:px-10 py-8 text-[13px] text-foreground/90 space-y-2 bg-card">
-          <div className="text-center space-y-1 pb-4">
-            <h2 className="text-xl font-bold text-primary tracking-wide">ДОГОВОР</h2>
+      <Card className="card-elevated overflow-hidden border-border/70">
+        <div className="h-1.5 gradient-bg" />
+        <div className="px-5 sm:px-14 py-10 text-[13px] text-foreground/90 space-y-2 bg-card max-w-[860px] mx-auto">
+          <div className="text-center space-y-2 pb-8">
+            <h2 className="text-2xl font-extrabold text-primary tracking-[0.2em]">ДОГОВОР</h2>
             <p className="text-[13px] font-medium text-muted-foreground">за извършване на строително-ремонтни работи</p>
-            <p className="text-[13px]">
+            <p className="text-[13px] pt-1">
               № <InlineField value={p.docNumber} onChange={p.setDocNumber} placeholder="1.2.3" min={5} />
             </p>
+            <div className="mx-auto mt-4 h-px w-24 bg-primary/30" />
           </div>
+
 
           <Article>
             Днес, <InlineField type="date" value={p.startDate} onChange={p.setStartDate} /> г., в гр.{" "}
