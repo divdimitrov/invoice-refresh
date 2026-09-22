@@ -251,12 +251,14 @@ export function EditableWrap({
   override,
   onChange,
   children,
+  unlocked = false,
 }: {
   id: string;
   plain: string;
   override?: string;
   onChange: (v: string | null) => void;
   children: ReactNode;
+  unlocked?: boolean;
 }) {
   const [opened, setOpened] = useState(false);
 
@@ -266,7 +268,8 @@ export function EditableWrap({
         key={id}
         text={override}
         original={plain}
-        autoEdit={opened}
+        autoEdit={opened && unlocked}
+        unlocked={unlocked}
         resetLabel="Върни полетата"
         onChange={(v) => {
           if (v === null) setOpened(false);
@@ -276,10 +279,13 @@ export function EditableWrap({
     );
   }
 
+  if (!unlocked) return <Article>{children}</Article>;
+
   return (
     <div className="group relative my-1 rounded-lg px-2 py-1 transition-colors hover:bg-primary/[0.04]">
       <Article>{children}</Article>
       <div className="mt-0.5">
+
         <button
           type="button"
           title="Промени текста на клаузата"
