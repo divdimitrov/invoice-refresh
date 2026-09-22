@@ -191,17 +191,31 @@ export function EditableClause({
   }
 
   return (
-    <p className="group relative leading-[2.3] text-justify">
-      <span className={changed ? "bg-primary/[0.05] rounded px-0.5" : undefined}>{text}</span>{" "}
-      <button
-        type="button"
-        title="Промени клаузата"
-        onClick={() => setEditing(true)}
-        className="align-baseline text-[10px] text-muted-foreground/60 underline underline-offset-2 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 focus:opacity-100 hover:text-primary"
-      >
-        промени
-      </button>
-    </p>
+    <div className="group relative my-1 rounded-lg px-2 py-1 transition-colors hover:bg-primary/[0.04]">
+      <p className="leading-[2.3] text-justify">
+        <span className={changed ? "bg-primary/[0.07] rounded px-0.5" : undefined}>{text}</span>
+      </p>
+      <div className="mt-0.5 flex items-center gap-2">
+        <button
+          type="button"
+          title="Промени клаузата"
+          onClick={() => setEditing(true)}
+          className="inline-flex items-center gap-1 rounded-md border border-primary/30 bg-primary/[0.07] px-2 py-0.5 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15"
+        >
+          <Pencil className="h-3 w-3" />
+          Промени текста
+        </button>
+        {changed && (
+          <button
+            type="button"
+            onClick={() => onChange(null)}
+            className="text-[11px] text-muted-foreground underline underline-offset-2 hover:text-primary"
+          >
+            Върни оригинала
+          </button>
+        )}
+      </div>
+    </div>
   );
 }
 
