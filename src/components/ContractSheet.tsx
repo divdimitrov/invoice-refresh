@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
-import { InlineField, InlineSelect, InlineCombo, InlineArea, Article, ContractHeading, EditableClause } from "./ContractEditor";
+import { InlineField, InlineSelect, InlineCombo, InlineArea, Article, ContractHeading, EditableClause, EditableWrap } from "./ContractEditor";
 import { CLAUSES, clauseText } from "@/lib/contract-clauses";
 
 export interface ContractSheetProps {
@@ -38,6 +38,25 @@ export default function ContractSheet(p: ContractSheetProps) {
       onChange={(v) => p.setClauseOverride(id, v)}
     />
   );
+
+  const D = "...........................";
+  const bg = (d: string) => {
+    if (!d) return "..........";
+    const [y, m, dd] = d.split("-");
+    return `${dd}.${m}.${y}`;
+  };
+  const W = (id: string, plain: string, children: React.ReactNode) => (
+    <EditableWrap
+      key={id}
+      id={id}
+      plain={plain}
+      override={p.clauseOverrides[id]}
+      onChange={(v) => p.setClauseOverride(id, v)}
+    >
+      {children}
+    </EditableWrap>
+  );
+  const pct = () => (p.penaltyPercent ? `${p.penaltyPercent}%` : "....%");
 
   const penalty = () => <InlineField value={p.penaltyPercent} onChange={p.setPenaltyPercent} placeholder="0.5" min={3} />;
 
@@ -88,34 +107,54 @@ export default function ContractSheet(p: ContractSheetProps) {
           <Article>се сключи настоящият договор за следното:</Article>
 
           <ContractHeading>ПРЕДМЕТ НА ДОГОВОРА</ContractHeading>
-          <Article>
-            <b>Чл. 1.</b> (1) ВЪЗЛОЖИТЕЛЯТ възлага, а ИЗПЪЛНИТЕЛЯТ приема да извърши на свой риск и срещу възнаграждение от страна на Възложителя
-            следните строително-ремонтни работи: <InlineField value={p.object} onChange={p.setObject} placeholder="описание на обекта" min={24} />, описани
-            подробно в приложение 1, неразделна част от договора.
-          </Article>
+          {W(
+            "c1_1",
+            `Чл. 1. (1) ВЪЗЛОЖИТЕЛЯТ възлага, а ИЗПЪЛНИТЕЛЯТ приема да извърши на свой риск и срещу възнаграждение от страна на Възложителя следните строително-ремонтни работи: ${p.object || D}, описани подробно в приложение 1, неразделна част от договора.`,
+            <>
+              <b>Чл. 1.</b> (1) ВЪЗЛОЖИТЕЛЯТ възлага, а ИЗПЪЛНИТЕЛЯТ приема да извърши на свой риск и срещу възнаграждение от страна на Възложителя
+              следните строително-ремонтни работи: <InlineField value={p.object} onChange={p.setObject} placeholder="описание на обекта" min={24} />, описани
+              подробно в приложение 1, неразделна част от договора.
+            </>
+          )}
           {C("c1_2")}
 
           <ContractHeading>ЦЕНА ПО ДОГОВОРА</ContractHeading>
-          <Article>
-            <b>Чл. 2.</b> (1) Цената, която Възложителят ще заплати на Изпълнителя за строително-ремонтните работи по чл. 1 от договора, е както следва:{" "}
-            <InlineField value={p.contractPrice} onChange={p.setContractPrice} placeholder="12 000 € без ДДС" min={18} />
-          </Article>
-          <Article>
-            (2) Страните договарят плащането (плащанията) да бъде извършено както следва:
-            <InlineArea value={p.paymentTerms} onChange={p.setPaymentTerms} placeholder="Напр. 50% авансово, 50% след приемане" />
-          </Article>
-          <Article>
-            (3) Страните договарят плащанията да бъдат извършвани по следната банкова сметка на Изпълнителя:{" "}
-            <InlineField value={p.bankAccount} onChange={p.setBankAccount} placeholder="BG00XXXX00000000000000" min={22} />
-          </Article>
+          {W(
+            "c2_1",
+            `Чл. 2. (1) Цената, която Възложителят ще заплати на Изпълнителя за строително-ремонтните работи по чл. 1 от договора, е както следва: ${p.contractPrice || D}`,
+            <>
+              <b>Чл. 2.</b> (1) Цената, която Възложителят ще заплати на Изпълнителя за строително-ремонтните работи по чл. 1 от договора, е както следва:{" "}
+              <InlineField value={p.contractPrice} onChange={p.setContractPrice} placeholder="12 000 € без ДДС" min={18} />
+            </>
+          )}
+          {W(
+            "c2_2",
+            `(2) Страните договарят плащането (плащанията) да бъде извършено както следва: ${p.paymentTerms || D}`,
+            <>
+              (2) Страните договарят плащането (плащанията) да бъде извършено както следва:
+              <InlineArea value={p.paymentTerms} onChange={p.setPaymentTerms} placeholder="Напр. 50% авансово, 50% след приемане" />
+            </>
+          )}
+          {W(
+            "c2_3",
+            `(3) Страните договарят плащанията да бъдат извършвани по следната банкова сметка на Изпълнителя: ${p.bankAccount || D}`,
+            <>
+              (3) Страните договарят плащанията да бъдат извършвани по следната банкова сметка на Изпълнителя:{" "}
+              <InlineField value={p.bankAccount} onChange={p.setBankAccount} placeholder="BG00XXXX00000000000000" min={22} />
+            </>
+          )}
           {C("c2_4")}
 
           <ContractHeading>СРОК ЗА ИЗПЪЛНЕНИЕ</ContractHeading>
-          <Article>
-            <b>Чл. 3.</b> Сроковете за изпълнение на работата са както следва: от{" "}
-            <InlineField type="date" value={p.startDate} onChange={p.setStartDate} /> г. до{" "}
-            <InlineField type="date" value={p.endDate} onChange={p.setEndDate} /> г.
-          </Article>
+          {W(
+            "c3",
+            `Чл. 3. Сроковете за изпълнение на работата са както следва: от ${bg(p.startDate)} г. до ${bg(p.endDate)} г.`,
+            <>
+              <b>Чл. 3.</b> Сроковете за изпълнение на работата са както следва: от{" "}
+              <InlineField type="date" value={p.startDate} onChange={p.setStartDate} /> г. до{" "}
+              <InlineField type="date" value={p.endDate} onChange={p.setEndDate} /> г.
+            </>
+          )}
 
           <ContractHeading>ПРАВА И ЗАДЪЛЖЕНИЯ НА СТРАНИТЕ</ContractHeading>
           {C("c4")}
@@ -128,28 +167,44 @@ export default function ContractSheet(p: ContractSheetProps) {
 
           <ContractHeading>ПРИЕМАНЕ НА РАБОТАТА</ContractHeading>
           {C("c8")}
-          <Article>
-            <b>Чл. 9.</b> ИЗПЪЛНИТЕЛЯТ се задължава да отстранява за своя сметка скритите недостатъци и появилите се впоследствие дефекти в следния
-            гаранционен срок: <InlineField value={p.warrantyMonths} onChange={p.setWarrantyMonths} placeholder="12" min={3} /> месеца, който тече от деня на
-            предаване на обекта с приемо-предавателен протокол.
-          </Article>
+          {W(
+            "c9",
+            `Чл. 9. ИЗПЪЛНИТЕЛЯТ се задължава да отстранява за своя сметка скритите недостатъци и появилите се впоследствие дефекти в следния гаранционен срок: ${p.warrantyMonths ? `${p.warrantyMonths} месеца` : D}, който тече от деня на предаване на обекта с приемо-предавателен протокол.`,
+            <>
+              <b>Чл. 9.</b> ИЗПЪЛНИТЕЛЯТ се задължава да отстранява за своя сметка скритите недостатъци и появилите се впоследствие дефекти в следния
+              гаранционен срок: <InlineField value={p.warrantyMonths} onChange={p.setWarrantyMonths} placeholder="12" min={3} /> месеца, който тече от деня на
+              предаване на обекта с приемо-предавателен протокол.
+            </>
+          )}
           {C("c10")}
 
           <ContractHeading>НЕИЗПЪЛНЕНИЕ. ОТГОВОРНОСТ</ContractHeading>
           {C("c11")}
-          <Article>
-            <b>Чл. 12.</b> (1) При забава за завършване и предаване на работите по този договор в срока по настоящия договор ИЗПЪЛНИТЕЛЯТ дължи неустойка в
-            размер на {penalty()}% за всеки просрочен ден, но не повече от 10% от стойността на договора.
-          </Article>
-          <Article>
-            (2) При забава в плащането от страна на ВЪЗЛОЖИТЕЛЯ същият дължи неустойка в размер на {penalty()}% от стойността на фактурата за всеки просрочен
-            ден, но не повече от 10% от нея.
-          </Article>
-          <Article>
-            <b>Чл. 13.</b> (1) При виновно некачествено извършване на ремонтните работи, освен задължението за отстраняване на дефектите и другите
-            възможности, предвидени в чл. 265 от ЗЗД, ИЗПЪЛНИТЕЛЯТ дължи и неустойка в размер на {penalty()}% от стойността на некачествено извършените
-            работи.
-          </Article>
+          {W(
+            "c12_1",
+            `Чл. 12. (1) При забава за завършване и предаване на работите по този договор в срока по настоящия договор ИЗПЪЛНИТЕЛЯТ дължи неустойка в размер на ${pct()} за всеки просрочен ден, но не повече от 10% от стойността на договора.`,
+            <>
+              <b>Чл. 12.</b> (1) При забава за завършване и предаване на работите по този договор в срока по настоящия договор ИЗПЪЛНИТЕЛЯТ дължи неустойка в
+              размер на {penalty()}% за всеки просрочен ден, но не повече от 10% от стойността на договора.
+            </>
+          )}
+          {W(
+            "c12_2",
+            `(2) При забава в плащането от страна на ВЪЗЛОЖИТЕЛЯ същият дължи неустойка в размер на ${pct()} от стойността на фактурата за всеки просрочен ден, но не повече от 10% от нея.`,
+            <>
+              (2) При забава в плащането от страна на ВЪЗЛОЖИТЕЛЯ същият дължи неустойка в размер на {penalty()}% от стойността на фактурата за всеки просрочен
+              ден, но не повече от 10% от нея.
+            </>
+          )}
+          {W(
+            "c13",
+            `Чл. 13. (1) При виновно некачествено извършване на ремонтните работи, освен задължението за отстраняване на дефектите и другите възможности, предвидени в чл. 265 от ЗЗД, ИЗПЪЛНИТЕЛЯТ дължи и неустойка в размер на ${pct()} от стойността на некачествено извършените работи.`,
+            <>
+              <b>Чл. 13.</b> (1) При виновно некачествено извършване на ремонтните работи, освен задължението за отстраняване на дефектите и другите
+              възможности, предвидени в чл. 265 от ЗЗД, ИЗПЪЛНИТЕЛЯТ дължи и неустойка в размер на {penalty()}% от стойността на некачествено извършените
+              работи.
+            </>
+          )}
 
           <ContractHeading>ПРЕКРАТЯВАНЕ И РАЗВАЛЯНЕ НА ДОГОВОРА</ContractHeading>
           {C("c14")}
