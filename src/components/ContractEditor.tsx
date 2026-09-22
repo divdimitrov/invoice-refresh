@@ -1,3 +1,4 @@
+import { Pencil } from "lucide-react";
 import { ReactNode, useState } from "react";
 
 interface InlineProps {
