@@ -37,14 +37,19 @@ export interface ContractSheetProps {
 }
 
 export default function ContractSheet(p: ContractSheetProps) {
+  const [unlocked, setUnlocked] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const C = (id: string) => (
     <EditableClause
       key={id}
       text={clauseText(id, p.clauseOverrides)}
       original={CLAUSES[id]}
+      unlocked={unlocked}
       onChange={(v) => p.setClauseOverride(id, v)}
     />
   );
+
 
   const D = "...........................";
   const bg = (d: string) => {
