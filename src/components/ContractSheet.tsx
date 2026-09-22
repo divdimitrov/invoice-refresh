@@ -78,7 +78,37 @@ export default function ContractSheet(p: ContractSheetProps) {
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.05 }}>
       <Card className="card-elevated overflow-hidden border-border/70">
         <div className="h-1.5 gradient-bg" />
+        <div className="flex items-center justify-between gap-3 border-b border-border/60 bg-muted/30 px-5 sm:px-14 py-2.5">
+          <span className="text-[11px] text-muted-foreground">
+            {unlocked ? "Текстът на клаузите е отключен за промяна" : "Текстът на клаузите е заключен"}
+          </span>
+          <button
+            type="button"
+            onClick={() => (unlocked ? setUnlocked(false) : setConfirmOpen(true))}
+            className="inline-flex items-center gap-1.5 rounded-md border border-primary/30 bg-primary/[0.07] px-2.5 py-1 text-[11px] font-medium text-primary transition-colors hover:bg-primary/15"
+          >
+            {unlocked ? <LockOpen className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+            {unlocked ? "Заключи текста" : "Отключи текста"}
+          </button>
+        </div>
+
+        <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Да отключа ли текста на договора?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Ще можеш да променяш текста на всяка клауза. Промените важат само за този документ и влизат в PDF-а.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Отказ</AlertDialogCancel>
+              <AlertDialogAction onClick={() => setUnlocked(true)}>Да, отключи</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
         <div className="px-5 sm:px-14 py-10 text-[13px] text-foreground/90 space-y-2 bg-card max-w-[860px] mx-auto">
+
           <div className="text-center space-y-2 pb-8">
             <h2 className="text-2xl font-extrabold text-primary tracking-[0.2em]">ДОГОВОР</h2>
             <p className="text-[13px] font-medium text-muted-foreground">за извършване на строително-ремонтни работи</p>
